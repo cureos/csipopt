@@ -4,7 +4,6 @@
 // Author:  Anders Gustafsson, Cureos AB 2010-12-08
 
 using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace Cureos.Numerics
@@ -117,7 +116,7 @@ namespace Cureos.Numerics
     /// <param name="m">Number of constraint functions</param>
     /// <param name="lambda">Multipliers for the constraint functions in the Lagrangian</param>
     /// <param name="new_lambda">true if lambda values are new for this call, false otherwise</param>
-    /// <param name="nele_jac">Number of non-zero elements in the Hessian</param>
+    /// <param name="nele_hess">Number of non-zero elements in the Hessian</param>
     /// <param name="iRow">Row indices of the non-zero Hessian elements, defined here if values is null</param>
     /// <param name="jCol">Column indices of the non-zero Hessian elements, defined here if values is null</param>
     /// <param name="values">Values of the non-zero Hessian elements</param>
@@ -184,7 +183,7 @@ namespace Cureos.Numerics
 
         private class ObjectiveEvaluator
         {
-            private EvaluateObjectiveDelegate m_eval_f;
+            private readonly EvaluateObjectiveDelegate m_eval_f;
 
             internal ObjectiveEvaluator(EvaluateObjectiveDelegate eval_f)
             {
@@ -200,7 +199,7 @@ namespace Cureos.Numerics
 
         private class ConstraintsEvaluator
         {
-            private EvaluateConstraintsDelegate m_eval_g;
+            private readonly EvaluateConstraintsDelegate m_eval_g;
 
             internal ConstraintsEvaluator(EvaluateConstraintsDelegate eval_g)
             {
@@ -221,7 +220,7 @@ namespace Cureos.Numerics
 
         private class ObjectiveGradientEvaluator
         {
-            private EvaluateObjectiveGradientDelegate m_eval_grad_f;
+            private readonly EvaluateObjectiveGradientDelegate m_eval_grad_f;
 
             internal ObjectiveGradientEvaluator(EvaluateObjectiveGradientDelegate eval_grad_f)
             {
@@ -242,7 +241,7 @@ namespace Cureos.Numerics
 
         private class JacobianEvaluator
         {
-            private EvaluateJacobianDelegate m_eval_jac_g;
+            private readonly EvaluateJacobianDelegate m_eval_jac_g;
 
             internal JacobianEvaluator(EvaluateJacobianDelegate eval_jac_g)
             {
@@ -267,7 +266,7 @@ namespace Cureos.Numerics
 
         private class HessianEvaluator
         {
-            private EvaluateHessianDelegate m_eval_h;
+            private readonly EvaluateHessianDelegate m_eval_h;
 
             internal HessianEvaluator(EvaluateHessianDelegate eval_h)
             {
@@ -294,7 +293,7 @@ namespace Cureos.Numerics
 
         private class IntermediateReporter
         {
-            private IntermediateDelegate m_intermediate;
+            private readonly IntermediateDelegate m_intermediate;
 
             internal IntermediateReporter(IntermediateDelegate intermediate)
             {
@@ -333,11 +332,11 @@ namespace Cureos.Numerics
         private IntPtr m_problem;
         private bool m_disposed;
 
-        private Eval_F_CB m_eval_f;
-        private Eval_G_CB m_eval_g; 
-        private Eval_Grad_F_CB m_eval_grad_f;
-        private Eval_Jac_G_CB m_eval_jac_g;
-        private Eval_H_CB m_eval_h;
+        private readonly Eval_F_CB m_eval_f;
+        private readonly Eval_G_CB m_eval_g; 
+        private readonly Eval_Grad_F_CB m_eval_grad_f;
+        private readonly Eval_Jac_G_CB m_eval_jac_g;
+        private readonly Eval_H_CB m_eval_h;
         private Intermediate_CB m_intermediate;
 
         #endregion
@@ -408,7 +407,7 @@ namespace Cureos.Numerics
         /// </summary>
         ~Ipopt()
         {
-            Dispose(false);
+            DisposeImpl();
         }
 
         #endregion
@@ -420,7 +419,7 @@ namespace Cureos.Numerics
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
+            DisposeImpl();
             GC.SuppressFinalize(this);
         }
 
@@ -538,7 +537,7 @@ namespace Cureos.Numerics
 
         #region PRIVATE METHODS
 
-        private void Dispose(bool disposing)
+        private void DisposeImpl()
         {
             if (!m_disposed)
             {
@@ -603,7 +602,7 @@ namespace Cureos.Numerics
         unsafe private static extern int SetIpoptProblemScaling(IntPtr ipopt_problem, double obj_scaling, double* x_scaling, double* g_scaling);
 
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        unsafe private static extern int SetIntermediateCallback(IntPtr ipopt_problem, Intermediate_CB intermediate_cb);
+        private static extern int SetIntermediateCallback(IntPtr ipopt_problem, Intermediate_CB intermediate_cb);
 
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         unsafe private static extern int IpoptSolve(

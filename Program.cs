@@ -4,7 +4,6 @@
 // Author:  Anders Gustafsson, Cureos AB 2010-12-07
 
 using System;
-using System.IO;
 using Cureos.Numerics;
 
 namespace hs071_cs
@@ -19,13 +18,12 @@ namespace hs071_cs
             /* allocate space for the initial point and set the values */
             double[] x = { 1.0, 5.0, 5.0, 1.0 };
 
-            double obj;
             IpoptReturnCode status;
 
-            using (Ipopt problem = new Ipopt(p.n, p.x_L, p.x_U, p.m, p.g_L, p.g_U, p.nele_jac, p.nele_hess, 
+            using (Ipopt problem = new Ipopt(p._n, p._x_L, p._x_U, p._m, p._g_L, p._g_U, p._nele_jac, p._nele_hess, 
                 p.eval_f, p.eval_g, p.eval_grad_f, p.eval_jac_g, p.eval_h))
             {
-                /* Set some options.  Note the following ones are only examples,
+                /* Set some options.  The following ones are only examples,
                    they might not be suitable for your problem. */
                 problem.AddOption("tol", 1e-7);
                 problem.AddOption("mu_strategy", "adaptive");
@@ -35,47 +33,51 @@ namespace hs071_cs
                 problem.SetIntermediateCallback(p.intermediate);
 #endif
                 /* solve the problem */
+                double obj;
                 status = problem.SolveProblem(x, out obj, null, null, null, null);
             }
 
             Console.WriteLine("{0}{0}Optimization return status: {1}{0}{0}", Environment.NewLine, status);
 
             for (int i = 0; i < 4; ++i) Console.WriteLine("x[{0}]={1}", i, x[i]);
+
+            Console.WriteLine("{0}Press <RETURN> to exit...", Environment.NewLine);
+            Console.ReadLine();
         }
     }
 
     public class HS071
     {
-        public int n;
-        public int m;
-        public int nele_jac;
-        public int nele_hess;
-        public double[] x_L;
-        public double[] x_U;
-        public double[] g_L;
-        public double[] g_U;
+        public int _n;
+        public int _m;
+        public int _nele_jac;
+        public int _nele_hess;
+        public double[] _x_L;
+        public double[] _x_U;
+        public double[] _g_L;
+        public double[] _g_U;
 
         public HS071()
         {
             /* set the number of variables and allocate space for the bounds */
             /* set the values for the variable bounds */
-            n = 4;
-            x_L = new double[] { 1.0, 1.0, 1.0, 1.0 };
-            x_U = new double[] { 5.0, 5.0, 5.0, 5.0 };
+            _n = 4;
+            _x_L = new double[] { 1.0, 1.0, 1.0, 1.0 };
+            _x_U = new double[] { 5.0, 5.0, 5.0, 5.0 };
 
             /* set the number of constraints and allocate space for the bounds */
-            m = 2;
+            _m = 2;
 
             /* set the values of the constraint bounds */
-            g_L = new double[] { 25.0, 40.0 };
-            g_U = new double[] { Ipopt.PositiveInfinity, 40.0 };
+            _g_L = new double[] { 25.0, 40.0 };
+            _g_U = new double[] { Ipopt.PositiveInfinity, 40.0 };
 
             /* Number of nonzeros in the Jacobian of the constraints */
-            nele_jac = 8;
+            _nele_jac = 8;
 
             /* Number of nonzeros in the Hessian of the Lagrangian (lower or
                upper triangual part only) */
-            nele_hess = 10;
+            _nele_hess = 10;
         }
 
         public bool eval_f(int n, double[] x, bool new_x, out double obj_value)
