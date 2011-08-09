@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cureos.Numerics", "Cureos.Numerics\Cureos.Numerics.csproj", "{42CE61EC-A12B-4929-843D-453CE7A98D7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hs071_cs", "hs071_cs\hs071_cs.csproj", "{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42CE61EC-A12B-4929-843D-453CE7A98D7D}.Debug|x64.ActiveCfg = Debug|x64
+		{42CE61EC-A12B-4929-843D-453CE7A98D7D}.Debug|x64.Build.0 = Debug|x64
+		{42CE61EC-A12B-4929-843D-453CE7A98D7D}.Debug|x86.ActiveCfg = Debug|x86
+		{42CE61EC-A12B-4929-843D-453CE7A98D7D}.Debug|x86.Build.0 = Debug|x86
+		{42CE61EC-A12B-4929-843D-453CE7A98D7D}.Release|x64.ActiveCfg = Release|x64
+		{42CE61EC-A12B-4929-843D-453CE7A98D7D}.Release|x64.Build.0 = Release|x64
+		{42CE61EC-A12B-4929-843D-453CE7A98D7D}.Release|x86.ActiveCfg = Release|x86
+		{42CE61EC-A12B-4929-843D-453CE7A98D7D}.Release|x86.Build.0 = Release|x86
+		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Debug|x64.ActiveCfg = Debug|x64
+		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Debug|x64.Build.0 = Debug|x64
+		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Debug|x86.ActiveCfg = Debug|x86
+		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Debug|x86.Build.0 = Debug|x86
+		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Release|x64.ActiveCfg = Release|x64
+		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Release|x64.Build.0 = Release|x64
+		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Release|x86.ActiveCfg = Release|x86
+		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

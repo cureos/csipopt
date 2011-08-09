@@ -580,32 +580,32 @@ namespace Cureos.Numerics
 
         #region DLL METHOD DECLARATIONS
 
-        [DllImport(IpoptDllName)]
+        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         unsafe private static extern IntPtr CreateIpoptProblem(int n, double* x_L, double* x_U, int m, double* g_L, double* g_U,  int nele_jac, 
             int nele_hess, int index_style, Eval_F_CB eval_f, Eval_G_CB eval_g, Eval_Grad_F_CB eval_grad_f, Eval_Jac_G_CB eval_jac_g, Eval_H_CB eval_h);
 
-        [DllImport(IpoptDllName)]
+        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         private static extern void FreeIpoptProblem(IntPtr ipopt_problem);
 
-        [DllImport(IpoptDllName)]
+        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int AddIpoptStrOption(IntPtr ipopt_problem, string keyword, string val);
 
-        [DllImport(IpoptDllName)]
+        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int AddIpoptNumOption(IntPtr ipopt_problem, string keyword, double val);
 
-        [DllImport(IpoptDllName)]
+        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int AddIpoptIntOption(IntPtr ipopt_problem, string keyword, int val);
 
-        [DllImport(IpoptDllName)]
+        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int OpenIpoptOutputFile(IntPtr ipopt_problem, string file_name, int print_level);
 
-        [DllImport(IpoptDllName)]
+        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         unsafe private static extern int SetIpoptProblemScaling(IntPtr ipopt_problem, double obj_scaling, double* x_scaling, double* g_scaling);
 
-        [DllImport(IpoptDllName)]
+        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         unsafe private static extern int SetIntermediateCallback(IntPtr ipopt_problem, Intermediate_CB intermediate_cb);
 
-        [DllImport(IpoptDllName)]
+        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         unsafe private static extern int IpoptSolve(
             IntPtr ipopt_problem, double* x, double* g, double* obj_val, double* mult_g, double* mult_x_L, double* mult_x_U, void* user_data);
 

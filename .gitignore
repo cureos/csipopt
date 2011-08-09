@@ -1,0 +1,10 @@
+
+Cureos.Numerics/_ReSharper.Cureos.Numerics/
+*.dotCover
+*.user
+*.suo
+*.vs10x
+Cureos.Numerics/Cureos.Numerics/bin/
+Cureos.Numerics/Cureos.Numerics/obj/
+Cureos.Numerics/hs071_cs/bin/
+Cureos.Numerics/hs071_cs/obj/
