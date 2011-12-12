@@ -158,13 +158,24 @@ namespace Cureos.Numerics
         #region INTERNAL DELEGATES - BRIDGES BETWEEN DLL INTERFACE AND C# CALLBACK FUNCTIONS
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        unsafe private delegate int Eval_F_CB(int n, double* x, int new_x, double* obj_value, void* user_data);
+        [return: MarshalAs(UnmanagedType.I4)]
+        public delegate int Eval_F_CB(
+        [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
+        [MarshalAs(UnmanagedType.I4)] int new_x, [MarshalAs(UnmanagedType.R8)] out double obj_value, IntPtr user_data);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        unsafe private delegate int Eval_Grad_F_CB(int n, double* x, int new_x, double* grad_f, void* user_data);
+        [return: MarshalAs(UnmanagedType.I4)]
+        public delegate int Eval_Grad_F_CB(
+        [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
+        [MarshalAs(UnmanagedType.I4)] int new_x, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] grad_f, 
+        IntPtr user_data);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        unsafe private delegate int Eval_G_CB(int n, double* x, int new_x, int m, double* g, void* user_data);
+        [return: MarshalAs(UnmanagedType.I4)]
+        public delegate int Eval_G_CB(
+        [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
+        [MarshalAs(UnmanagedType.I4)] int new_x, [MarshalAs(UnmanagedType.I4)] int m,
+        [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] double[] g, IntPtr user_data);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         unsafe private delegate int Eval_Jac_G_CB(int n, double* x, int new_x, int m, int nele_jac, int* iRow, int* jCol, double* values, void* user_data);
@@ -326,8 +337,8 @@ namespace Cureos.Numerics
         /// </summary>
         public const double NegativeInfinity = -2.0e19;
 
-        private const int TRUE = 1;
-        private const int FALSE = 0;
+        public const int TRUE = 1;
+        public const int FALSE = 0;
 
         private IntPtr m_problem;
         private bool m_disposed;
@@ -375,16 +386,16 @@ namespace Cureos.Numerics
         /// <param name="eval_jac_g">Callback function for evaluating Jacobian of constraint functions</param>
         /// <param name="eval_h">Callback function for evaluating Hessian of Lagrangian function</param>
         public Ipopt(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, int nele_jac, int nele_hess,
-            EvaluateObjectiveDelegate eval_f, EvaluateConstraintsDelegate eval_g, EvaluateObjectiveGradientDelegate eval_grad_f, 
+            Eval_F_CB eval_f, Eval_G_CB eval_g, Eval_Grad_F_CB eval_grad_f, 
             EvaluateJacobianDelegate eval_jac_g, EvaluateHessianDelegate eval_h)
         {
             unsafe
             {
                 fixed (double* p_x_L = x_L, p_x_U = x_U, p_g_L = g_L, p_g_U = g_U)
                 {
-                    m_eval_f = new ObjectiveEvaluator(eval_f).Evaluate;
-                    m_eval_g = new ConstraintsEvaluator(eval_g).Evaluate; 
-                    m_eval_grad_f = new ObjectiveGradientEvaluator(eval_grad_f).Evaluate;
+                    m_eval_f = eval_f;
+                    m_eval_g = eval_g; 
+                    m_eval_grad_f = eval_grad_f;
                     m_eval_jac_g = new JacobianEvaluator(eval_jac_g).Evaluate;
                     m_eval_h = new HessianEvaluator(eval_h).Evaluate;
                     m_intermediate = null;

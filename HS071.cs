@@ -23,15 +23,15 @@ namespace Cureos.Numerics
             /* set the number of variables and allocate space for the bounds */
             /* set the values for the variable bounds */
             _n = 4;
-            _x_L = new double[] { 1.0, 1.0, 1.0, 1.0 };
-            _x_U = new double[] { 5.0, 5.0, 5.0, 5.0 };
+            _x_L = new[] { 1.0, 1.0, 1.0, 1.0 };
+            _x_U = new[] { 5.0, 5.0, 5.0, 5.0 };
 
             /* set the number of constraints and allocate space for the bounds */
             _m = 2;
 
             /* set the values of the constraint bounds */
-            _g_L = new double[] { 25.0, 40.0 };
-            _g_U = new double[] { Ipopt.PositiveInfinity, 40.0 };
+            _g_L = new[] { 25.0, 40.0 };
+            _g_U = new[] { Ipopt.PositiveInfinity, 40.0 };
 
             /* Number of nonzeros in the Jacobian of the constraints */
             _nele_jac = 8;
@@ -41,29 +41,29 @@ namespace Cureos.Numerics
             _nele_hess = 10;
         }
 
-        public bool eval_f(int n, double[] x, bool new_x, out double obj_value)
+        public int eval_f(int n, double[] x, int new_x, out double obj_value, IntPtr user_data)
         {
             obj_value = x[0] * x[3] * (x[0] + x[1] + x[2]) + x[2];
 
-            return true;
+            return Ipopt.TRUE;
         }
 
-        public bool eval_grad_f(int n, double[] x, bool new_x, double[] grad_f)
+        public int eval_grad_f(int n, double[] x, int new_x, double[] grad_f, IntPtr user_data)
         {
             grad_f[0] = x[0] * x[3] + x[3] * (x[0] + x[1] + x[2]);
             grad_f[1] = x[0] * x[3];
             grad_f[2] = x[0] * x[3] + 1;
             grad_f[3] = x[0] * (x[0] + x[1] + x[2]);
 
-            return true;
+            return Ipopt.TRUE;
         }
 
-        public bool eval_g(int n, double[] x, bool new_x, int m, double[] g)
+        public int eval_g(int n, double[] x, int new_x, int m, double[] g, IntPtr user_data)
         {
             g[0] = x[0] * x[1] * x[2] * x[3];
             g[1] = x[0] * x[0] + x[1] * x[1] + x[2] * x[2] + x[3] * x[3];
 
-            return true;
+            return Ipopt.TRUE;
         }
 
         public bool eval_jac_g(int n, double[] x, bool new_x, int m, int nele_jac, int[] iRow, int[] jCol, double[] values)

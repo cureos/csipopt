@@ -73,9 +73,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Program.cs">
-      <Link>Program.cs</Link>
+    <Compile Include="..\..\HS071.cs">
+      <Link>HS071.cs</Link>
     </Compile>
+    <Compile Include="MainClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
