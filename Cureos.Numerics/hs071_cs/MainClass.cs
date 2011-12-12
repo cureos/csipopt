@@ -29,7 +29,7 @@ namespace hs071_cs
             Ipopt.AddIpoptOption(problem, "mu_strategy", "adaptive");
             Ipopt.AddIpoptOption(problem, "output_file", "hs071.txt");
 #if INTERMEDIATE
-            CsIpopt.SetIntermediateCallback(problem, p.intermediate);
+            Ipopt.SetIntermediateCallback(problem, p.intermediate);
 #endif
             // Solve the problem.
             IpoptReturnCode status =
