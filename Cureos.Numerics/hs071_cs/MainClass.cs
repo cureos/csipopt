@@ -20,6 +20,7 @@ namespace hs071_cs
 
             IpoptReturnCode status;
 
+            double obj;
             using (Ipopt problem = new Ipopt(p._n, p._x_L, p._x_U, p._m, p._g_L, p._g_U, p._nele_jac, p._nele_hess,
                                              p.eval_f, p.eval_g, p.eval_grad_f, p.eval_jac_g, p.eval_h))
             {
@@ -28,16 +29,14 @@ namespace hs071_cs
                 problem.AddOption("tol", 1e-7);
                 problem.AddOption("mu_strategy", "adaptive");
                 problem.AddOption("output_file", "hs071.txt");
-
 #if INTERMEDIATE
                 problem.SetIntermediateCallback(p.intermediate);
 #endif
                 /* solve the problem */
-                double obj;
                 status = problem.SolveProblem(x, out obj, null, null, null, null);
             }
 
-            Console.WriteLine("{0}{0}Optimization return status: {1}{0}{0}", Environment.NewLine, status);
+            Console.WriteLine("{0}{0}Optimization value: {1}, return status: {2}{0}{0}", Environment.NewLine, obj, status);
 
             for (int i = 0; i < 4; ++i) Console.WriteLine("x[{0}]={1}", i, x[i]);
 

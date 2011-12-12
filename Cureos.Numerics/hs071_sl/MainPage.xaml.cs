@@ -38,7 +38,6 @@ namespace hs071_sl
                        they might not be suitable for your problem. */
                     problem.AddOption("tol", 1e-7);
                     problem.AddOption("mu_strategy", "adaptive");
-                    problem.AddOption("output_file", "hs071.txt");
 
 #if INTERMEDIATE
                 problem.SetIntermediateCallback(p.intermediate);

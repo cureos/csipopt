@@ -4,6 +4,7 @@
 // Author:  Anders Gustafsson, Cureos AB 2011-09-02
 
 using System;
+using System.Runtime.InteropServices;
 
 namespace Cureos.Numerics
 {
@@ -41,6 +42,7 @@ namespace Cureos.Numerics
             _nele_hess = 10;
         }
 
+        [AllowReversePInvokeCalls]
         public int eval_f(int n, double[] x, int new_x, out double obj_value, IntPtr user_data)
         {
             obj_value = x[0] * x[3] * (x[0] + x[1] + x[2]) + x[2];
@@ -48,6 +50,7 @@ namespace Cureos.Numerics
             return Ipopt.TRUE;
         }
 
+        [AllowReversePInvokeCalls]
         public int eval_grad_f(int n, double[] x, int new_x, double[] grad_f, IntPtr user_data)
         {
             grad_f[0] = x[0] * x[3] + x[3] * (x[0] + x[1] + x[2]);
@@ -58,6 +61,7 @@ namespace Cureos.Numerics
             return Ipopt.TRUE;
         }
 
+        [AllowReversePInvokeCalls]
         public int eval_g(int n, double[] x, int new_x, int m, double[] g, IntPtr user_data)
         {
             g[0] = x[0] * x[1] * x[2] * x[3];
@@ -66,7 +70,8 @@ namespace Cureos.Numerics
             return Ipopt.TRUE;
         }
 
-        public bool eval_jac_g(int n, double[] x, bool new_x, int m, int nele_jac, int[] iRow, int[] jCol, double[] values)
+        [AllowReversePInvokeCalls]
+        public int eval_jac_g(int n, double[] x, int new_x, int m, int nele_jac, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
         {
             if (values == null)
             {
@@ -105,13 +110,14 @@ namespace Cureos.Numerics
                 values[7] = 2 * x[3];         /* 1,3 */
             }
 
-            return true;
+            return Ipopt.TRUE;
         }
 
-        public bool eval_h(int n, double[] x, bool new_x, double obj_factor,
-                    int m, double[] lambda, bool new_lambda,
+        [AllowReversePInvokeCalls]
+        public int eval_h(int n, double[] x, int new_x, double obj_factor,
+                    int m, double[] lambda, int new_lambda,
                     int nele_hess, int[] iRow, int[] jCol,
-                    double[] values)
+                    double[] values, IntPtr user_data)
         {
             if (values == null)
             {
@@ -172,16 +178,17 @@ namespace Cureos.Numerics
                 values[9] += lambda[1] * 2;                      /* 3,3 */
             }
 
-            return true;
+            return Ipopt.TRUE;
         }
 
 #if INTERMEDIATE
-        public bool intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
-            double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials)
+        [AllowReversePInvokeCalls]
+        public int intermediate(int alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
+            double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
         {
             Console.WriteLine("Intermediate callback method at iteration {0} in {1} with d_norm {2}",
-                iter_count, alg_mod, d_norm);
-            return iter_count < 5;
+                iter_count, (IpoptAlgorithmMode)alg_mod, d_norm);
+            return iter_count < 5 ? Ipopt.TRUE : Ipopt.FALSE;
         }
 #endif
 
