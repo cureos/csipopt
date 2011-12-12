@@ -28,20 +28,21 @@ namespace hs071_sl
 
             try
             {
-                IpoptReturnCode status;
                 double obj;
+                var problem = CsIpopt.CreateIpoptProblem(p._n, p._x_L, p._x_U, p._m, p._g_L, p._g_U, p._nele_jac,
+                                                         p._nele_hess, 0,
+                                                         p.eval_f, p.eval_g, p.eval_grad_f, p.eval_jac_g, p.eval_h);
 
-                using (var problem = new CsIpopt(p._n, p._x_L, p._x_U, p._m, p._g_L, p._g_U, p._nele_jac, p._nele_hess,
-                                                 p.eval_f, p.eval_g, p.eval_grad_f, p.eval_jac_g, p.eval_h))
-                {
-                    /* Set some options.  The following ones are only examples,
-                       they might not be suitable for your problem. */
-                    problem.AddOption("tol", 1e-7);
-                    problem.AddOption("mu_strategy", "adaptive");
+                // Set some options.  The following ones are only examples,
+                // they might not be suitable for your problem.
+                CsIpopt.AddIpoptOption(problem, "tol", 1e-7);
+                CsIpopt.AddIpoptOption(problem, "mu_strategy", "adaptive");
 
-                    /* solve the problem */
-                    status = problem.SolveProblem(x, out obj, null, null, null, null);
-                }
+                // Solve the problem.
+                IpoptReturnCode status = (IpoptReturnCode)CsIpopt.IpoptSolve(problem, x, null, out obj, null, null, null, IntPtr.Zero);
+
+                // Free problem resources.
+                CsIpopt.FreeIpoptProblem(problem);
 
                 var output = new StringBuilder();
                 output.AppendFormat("Optimization return status: {0}{1}{1}", status, Environment.NewLine);

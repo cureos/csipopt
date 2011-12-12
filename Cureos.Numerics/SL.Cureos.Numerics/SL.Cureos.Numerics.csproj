@@ -55,8 +55,8 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\CsIpopt.cs">
-      <Link>CsIpopt.cs</Link>
+    <Compile Include="..\..\SafeIpopt.cs">
+      <Link>SafeIpopt.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
