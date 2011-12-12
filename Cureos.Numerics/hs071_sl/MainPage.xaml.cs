@@ -39,9 +39,7 @@ namespace hs071_sl
                        they might not be suitable for your problem. */
                     problem.AddOption("tol", 1e-7);
                     problem.AddOption("mu_strategy", "adaptive");
-#if INTERMEDIATE
-                problem.SetIntermediateCallback(p.intermediate);
-#endif
+
                     /* solve the problem */
                     status = problem.SolveProblem(x, out obj, null, null, null, null);
                 }
@@ -61,7 +59,7 @@ namespace hs071_sl
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            NativeDllHelper.SetupNativeDllFolder("Ipopt39.dll", "IpOptFSS39.dll");
+            NativeDllHelper.SetupNativeDllFolder("Assets/Ipopt39.dll", "Assets/IpOptFSS39.dll");
         }
     }
 }
