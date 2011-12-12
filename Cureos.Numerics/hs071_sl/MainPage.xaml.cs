@@ -8,7 +8,6 @@ using System;
 using System.Text;
 using System.Windows;
 using Cureos.Numerics;
-using Cureos.Utility;
 
 namespace hs071_sl
 {
@@ -55,11 +54,6 @@ namespace hs071_sl
             {
                 OptOutputTextBox.Text = exc.GetType().FullName + ": " + exc.Message + Environment.NewLine + exc.StackTrace;
             }
-        }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            NativeDllHelper.SetupNativeDllFolder("Assets/Ipopt39.dll", "Assets/IpOptFSS39.dll");
         }
     }
 }
