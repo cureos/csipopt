@@ -21,7 +21,7 @@ namespace hs071_cs
             IpoptReturnCode status;
 
             double obj;
-            using (Ipopt problem = new Ipopt(p._n, p._x_L, p._x_U, p._m, p._g_L, p._g_U, p._nele_jac, p._nele_hess,
+            using (CsIpopt problem = new CsIpopt(p._n, p._x_L, p._x_U, p._m, p._g_L, p._g_U, p._nele_jac, p._nele_hess,
                                              p.eval_f, p.eval_g, p.eval_grad_f, p.eval_jac_g, p.eval_h))
             {
                 /* Set some options.  The following ones are only examples,

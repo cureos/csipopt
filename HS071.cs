@@ -32,7 +32,7 @@ namespace Cureos.Numerics
 
             /* set the values of the constraint bounds */
             _g_L = new[] { 25.0, 40.0 };
-            _g_U = new[] { Ipopt.PositiveInfinity, 40.0 };
+            _g_U = new[] { CsIpopt.PositiveInfinity, 40.0 };
 
             /* Number of nonzeros in the Jacobian of the constraints */
             _nele_jac = 8;
@@ -47,7 +47,7 @@ namespace Cureos.Numerics
         {
             obj_value = x[0] * x[3] * (x[0] + x[1] + x[2]) + x[2];
 
-            return Ipopt.TRUE;
+            return CsIpopt.TRUE;
         }
 
         [AllowReversePInvokeCalls]
@@ -58,7 +58,7 @@ namespace Cureos.Numerics
             grad_f[2] = x[0] * x[3] + 1;
             grad_f[3] = x[0] * (x[0] + x[1] + x[2]);
 
-            return Ipopt.TRUE;
+            return CsIpopt.TRUE;
         }
 
         [AllowReversePInvokeCalls]
@@ -67,7 +67,7 @@ namespace Cureos.Numerics
             g[0] = x[0] * x[1] * x[2] * x[3];
             g[1] = x[0] * x[0] + x[1] * x[1] + x[2] * x[2] + x[3] * x[3];
 
-            return Ipopt.TRUE;
+            return CsIpopt.TRUE;
         }
 
         [AllowReversePInvokeCalls]
@@ -110,7 +110,7 @@ namespace Cureos.Numerics
                 values[7] = 2 * x[3];         /* 1,3 */
             }
 
-            return Ipopt.TRUE;
+            return CsIpopt.TRUE;
         }
 
         [AllowReversePInvokeCalls]
@@ -178,7 +178,7 @@ namespace Cureos.Numerics
                 values[9] += lambda[1] * 2;                      /* 3,3 */
             }
 
-            return Ipopt.TRUE;
+            return CsIpopt.TRUE;
         }
 
 #if INTERMEDIATE

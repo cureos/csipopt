@@ -8,6 +8,7 @@ using System;
 using System.Text;
 using System.Windows;
 using Cureos.Numerics;
+using Cureos.Utility;
 
 namespace hs071_sl
 {
@@ -31,14 +32,13 @@ namespace hs071_sl
                 IpoptReturnCode status;
                 double obj;
 
-                using (Ipopt problem = new Ipopt(p._n, p._x_L, p._x_U, p._m, p._g_L, p._g_U, p._nele_jac, p._nele_hess,
+                using (var problem = new CsIpopt(p._n, p._x_L, p._x_U, p._m, p._g_L, p._g_U, p._nele_jac, p._nele_hess,
                                                  p.eval_f, p.eval_g, p.eval_grad_f, p.eval_jac_g, p.eval_h))
                 {
                     /* Set some options.  The following ones are only examples,
                        they might not be suitable for your problem. */
                     problem.AddOption("tol", 1e-7);
                     problem.AddOption("mu_strategy", "adaptive");
-
 #if INTERMEDIATE
                 problem.SetIntermediateCallback(p.intermediate);
 #endif
@@ -57,6 +57,11 @@ namespace hs071_sl
             {
                 OptOutputTextBox.Text = exc.GetType().FullName + ": " + exc.Message + Environment.NewLine + exc.StackTrace;
             }
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            NativeDllHelper.SetupNativeDllFolder("Ipopt39.dll", "IpOptFSS39.dll");
         }
     }
 }
