@@ -1,54 +1,13 @@
 ﻿// Copyright (C) 2010 Anders Gustafsson and others. All Rights Reserved.
 // This code is published under the Eclipse Public License.
 //
-// Author:  Anders Gustafsson, Cureos AB 2010-12-08
+// Author:  Anders Gustafsson, Cureos AB 2011-12-13
 
 using System;
 using System.Runtime.InteropServices;
 
 namespace Cureos.Numerics
 {
-    #region ENUMERATIONS
-
-    /// <summary>
-    /// Return codes for the Solve call for an IPOPT problem 
-    /// </summary>
-    public enum IpoptReturnCode
-    {
-        Solve_Succeeded = 0,
-        Solved_To_Acceptable_Level = 1,
-        Infeasible_Problem_Detected = 2,
-        Search_Direction_Becomes_Too_Small = 3,
-        Diverging_Iterates = 4,
-        User_Requested_Stop = 5,
-        Feasible_Point_Found = 6,
-
-        Maximum_Iterations_Exceeded = -1,
-        Restoration_Failed = -2,
-        Error_In_Step_Computation = -3,
-        Maximum_CpuTime_Exceeded = -4,
-        Not_Enough_Degrees_Of_Freedom = -10,
-        Invalid_Problem_Definition = -11,
-        Invalid_Option = -12,
-        Invalid_Number_Detected = -13,
-
-        Unrecoverable_Exception = -100,
-        NonIpopt_Exception_Thrown = -101,
-        Insufficient_Memory = -102,
-        Internal_Error = -199
-    }
-
-    /// <summary>
-    /// Enumeration to indicate the mode in which the algorithm is
-    /// </summary>
-    public enum IpoptAlgorithmMode
-    {
-        RegularMode = 0,
-        RestorationPhaseMode = 1
-    }
-
-    #endregion
-
     #region PUBLIC DELEGATES
 
     /// <summary>
@@ -153,32 +112,8 @@ namespace Cureos.Numerics
 
     #endregion
 
-    public sealed class Ipopt : IDisposable
+    public sealed partial class Ipopt : IDisposable
     {
-        #region INTERNAL DELEGATES - BRIDGES BETWEEN DLL INTERFACE AND C# CALLBACK FUNCTIONS
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        unsafe private delegate int Eval_F_CB(int n, double* x, int new_x, double* obj_value, void* user_data);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        unsafe private delegate int Eval_Grad_F_CB(int n, double* x, int new_x, double* grad_f, void* user_data);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        unsafe private delegate int Eval_G_CB(int n, double* x, int new_x, int m, double* g, void* user_data);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        unsafe private delegate int Eval_Jac_G_CB(int n, double* x, int new_x, int m, int nele_jac, int* iRow, int* jCol, double* values, void* user_data);
-        
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        unsafe private delegate int Eval_H_CB(int n, double* x, int new_x, double obj_factor, int m, double* lambda, int new_lambda, int nele_hess,
-            int* iRow, int* jCol, double* values, void* user_data);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        unsafe private delegate int Intermediate_CB(int alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
-            double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, void* user_data);
-
-        #endregion
-
         #region INTERNAL CALLBACK FUNCTION CLASSES
 
         private class ObjectiveEvaluator
@@ -190,10 +125,10 @@ namespace Cureos.Numerics
                 m_eval_f = eval_f;
             }
 
-            unsafe internal int Evaluate(int n, double* p_x, int new_x, double* p_obj_value, void* user_data)
+            [AllowReversePInvokeCalls]
+            internal int Evaluate(int n, double[] x, int new_x, out double obj_value, IntPtr user_data)
             {
-                double[] x = CreateArray(n, p_x);
-                return m_eval_f(n, x, new_x == TRUE, out *p_obj_value) ? TRUE : FALSE;
+                return m_eval_f(n, x, new_x == TRUE, out obj_value) ? TRUE : FALSE;
             }
         }
 
@@ -206,15 +141,10 @@ namespace Cureos.Numerics
                 m_eval_g = eval_g;
             }
 
-            unsafe internal int Evaluate(int n, double* p_x, int new_x, int m, double* p_g, void* user_data)
+            [AllowReversePInvokeCalls]
+            internal int Evaluate(int n, double[] x, int new_x, int m, double[] g, IntPtr user_data)
             {
-                double[] x = CreateArray(n, p_x);
-                double[] g = new double[m];
-
-                int ret = m_eval_g(n, x, new_x == TRUE, m, g) ? TRUE : FALSE;
-                CopyToPointer(m, g, p_g);
-
-                return ret;
+                return m_eval_g(n, x, new_x == TRUE, m, g) ? TRUE : FALSE;
             }
         }
 
@@ -227,15 +157,10 @@ namespace Cureos.Numerics
                 m_eval_grad_f = eval_grad_f;
             }
 
-            unsafe internal int Evaluate(int n, double* p_x, int new_x, double* p_grad_f, void* user_data)
+            [AllowReversePInvokeCalls]
+            internal int Evaluate(int n, double[] x, int new_x, double[] grad_f, IntPtr user_data)
             {
-                double[] x = CreateArray(n, p_x);
-                double[] grad_f = new double[n];
-
-                int ret = m_eval_grad_f(n, x, new_x == TRUE, grad_f) ? TRUE : FALSE;
-                CopyToPointer(n, grad_f, p_grad_f);
-
-                return ret;
+                return m_eval_grad_f(n, x, new_x == TRUE, grad_f) ? TRUE : FALSE;
             }
         }
 
@@ -248,19 +173,10 @@ namespace Cureos.Numerics
                 m_eval_jac_g = eval_jac_g;
             }
 
-            unsafe internal int Evaluate(int n, double* p_x, int new_x, int m, int nele_jac, int* p_iRow, int* p_jCol, double* p_values, void* user_data)
+            [AllowReversePInvokeCalls]
+            internal int Evaluate(int n, double[] x, int new_x, int m, int nele_jac, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
             {
-                double[] x = CreateArray(n, p_x);
-                int[] iRow = CreateArray(nele_jac, p_iRow);
-                int[] jCol = CreateArray(nele_jac, p_jCol);
-                double[] values = CreateArray(nele_jac, p_values);
-
-                int ret = m_eval_jac_g(n, x, new_x == TRUE, m, nele_jac, iRow, jCol, values) ? TRUE : FALSE;
-                CopyToPointer(nele_jac, iRow, p_iRow);
-                CopyToPointer(nele_jac, jCol, p_jCol);
-                CopyToPointer(nele_jac, values, p_values);
-
-                return ret;
+                return m_eval_jac_g(n, x, new_x == TRUE, m, nele_jac, iRow, jCol, values) ? TRUE : FALSE;
             }
         }
 
@@ -273,21 +189,11 @@ namespace Cureos.Numerics
                 m_eval_h = eval_h;
             }
 
-            unsafe internal int Evaluate(int n, double* p_x, int new_x, double obj_factor, int m, double* p_lambda, int new_lambda, int nele_hess,
-                int* p_iRow, int* p_jCol, double* p_values, void* user_data)
+            [AllowReversePInvokeCalls]
+            internal int Evaluate(int n, double[] x, int new_x, double obj_factor, int m, double[] lambda, int new_lambda, int nele_hess,
+                int[] iRow, int[] jCol, double[] values, IntPtr user_data)
             {
-                double[] x = CreateArray(n, p_x);
-                double[] lambda = CreateArray(m, p_lambda);
-                int[] iRow = CreateArray(nele_hess, p_iRow);
-                int[] jCol = CreateArray(nele_hess, p_jCol);
-                double[] values = CreateArray(nele_hess, p_values);
-
-                int ret = m_eval_h(n, x, new_x == TRUE, obj_factor, m, lambda, new_lambda == TRUE, nele_hess, iRow, jCol, values) ? TRUE : FALSE;
-                CopyToPointer(nele_hess, iRow, p_iRow);
-                CopyToPointer(nele_hess, jCol, p_jCol);
-                CopyToPointer(nele_hess, values, p_values);
-
-                return ret;
+                return m_eval_h(n, x, new_x == TRUE, obj_factor, m, lambda, new_lambda == TRUE, nele_hess, iRow, jCol, values) ? TRUE : FALSE;
             }
         }
 
@@ -300,8 +206,9 @@ namespace Cureos.Numerics
                 m_intermediate = intermediate;
             }
 
-            unsafe internal int Report(int alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
-                double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, void* user_data)
+            [AllowReversePInvokeCalls]
+            internal int Report(int alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
+                double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
             {
                 return m_intermediate((IpoptAlgorithmMode)alg_mod, iter_count, obj_value, inf_pr, inf_du, mu, d_norm, 
                     regularization_size, alpha_du, alpha_pr, ls_trials) ? TRUE : FALSE;
@@ -311,23 +218,6 @@ namespace Cureos.Numerics
         #endregion
 
         #region FIELDS
-
-        private const string IpoptDllName = "Ipopt39";
-
-        /// <summary>
-        /// Value to indicate that a variable or constraint function has no upper bound 
-        /// (provided that IPOPT option "nlp_upper_bound_inf" is less than 2e19)
-        /// </summary>
-        public const double PositiveInfinity =  2.0e19;
-
-        /// <summary>
-        /// Value to indicate that a variable or constraint function has no lower bound 
-        /// (provided that IPOPT option "nlp_lower_bound_inf" is greater than -2e19)
-        /// </summary>
-        public const double NegativeInfinity = -2.0e19;
-
-        private const int TRUE = 1;
-        private const int FALSE = 0;
 
         private IntPtr m_problem;
         private bool m_disposed;
@@ -375,28 +265,22 @@ namespace Cureos.Numerics
         /// <param name="eval_jac_g">Callback function for evaluating Jacobian of constraint functions</param>
         /// <param name="eval_h">Callback function for evaluating Hessian of Lagrangian function</param>
         public Ipopt(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, int nele_jac, int nele_hess,
-            EvaluateObjectiveDelegate eval_f, EvaluateConstraintsDelegate eval_g, EvaluateObjectiveGradientDelegate eval_grad_f, 
+            EvaluateObjectiveDelegate eval_f, EvaluateConstraintsDelegate eval_g, EvaluateObjectiveGradientDelegate eval_grad_f,
             EvaluateJacobianDelegate eval_jac_g, EvaluateHessianDelegate eval_h)
         {
-            unsafe
+            m_eval_f = new ObjectiveEvaluator(eval_f).Evaluate;
+            m_eval_g = new ConstraintsEvaluator(eval_g).Evaluate;
+            m_eval_grad_f = new ObjectiveGradientEvaluator(eval_grad_f).Evaluate;
+            m_eval_jac_g = new JacobianEvaluator(eval_jac_g).Evaluate;
+            m_eval_h = new HessianEvaluator(eval_h).Evaluate;
+            m_intermediate = null;
+
+            m_problem = CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, 0,
+                                           m_eval_f, m_eval_g, m_eval_grad_f, m_eval_jac_g, m_eval_h);
+
+            if (m_problem == IntPtr.Zero)
             {
-                fixed (double* p_x_L = x_L, p_x_U = x_U, p_g_L = g_L, p_g_U = g_U)
-                {
-                    m_eval_f = new ObjectiveEvaluator(eval_f).Evaluate;
-                    m_eval_g = new ConstraintsEvaluator(eval_g).Evaluate; 
-                    m_eval_grad_f = new ObjectiveGradientEvaluator(eval_grad_f).Evaluate;
-                    m_eval_jac_g = new JacobianEvaluator(eval_jac_g).Evaluate;
-                    m_eval_h = new HessianEvaluator(eval_h).Evaluate;
-                    m_intermediate = null;
-
-                    m_problem = CreateIpoptProblem(n, p_x_L, p_x_U, m, p_g_L, p_g_U, nele_jac, nele_hess, 0,
-                        m_eval_f, m_eval_g, m_eval_grad_f, m_eval_jac_g, m_eval_h);
-
-                    if (m_problem == IntPtr.Zero)
-                    {
-                        throw new ArgumentException("Failed to initialize IPOPT problem");
-                    }
-                }
+                throw new ArgumentException("Failed to initialize IPOPT problem");
             }
 
             m_disposed = false;
@@ -407,7 +291,7 @@ namespace Cureos.Numerics
         /// </summary>
         ~Ipopt()
         {
-            DisposeImpl();
+            Dispose(false);
         }
 
         #endregion
@@ -419,7 +303,7 @@ namespace Cureos.Numerics
         /// </summary>
         public void Dispose()
         {
-            DisposeImpl();
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -431,7 +315,7 @@ namespace Cureos.Numerics
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
         public bool AddOption(string keyword, string val)
         {
-            return AddIpoptStrOption(m_problem, keyword, val) == TRUE;
+            return AddIpoptOption(m_problem, keyword, val) == TRUE;
         }
 
         /// <summary>
@@ -442,7 +326,7 @@ namespace Cureos.Numerics
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
         public bool AddOption(string keyword, double val)
         {
-            return AddIpoptNumOption(m_problem, keyword, val) == TRUE;
+            return AddIpoptOption(m_problem, keyword, val) == TRUE;
         }
 
         /// <summary>
@@ -453,9 +337,10 @@ namespace Cureos.Numerics
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
         public bool AddOption(string keyword, int val)
         {
-            return AddIpoptIntOption(m_problem, keyword, val) == TRUE;
+            return AddIpoptOption(m_problem, keyword, val) == TRUE;
         }
 
+#if !SILVERLIGHT
         /// <summary>
         /// Method for opening an output file for a given name with given printlevel.
         /// </summary>
@@ -466,6 +351,7 @@ namespace Cureos.Numerics
         {
             return OpenIpoptOutputFile(m_problem, file_name, print_level) == TRUE;
         }
+#endif
 
         /// <summary>
         /// Optional function for setting scaling parameter for the NLP.
@@ -479,14 +365,7 @@ namespace Cureos.Numerics
         /// <returns>true if scaling succeeded, false otherwise</returns>
         public bool SetScaling(double obj_scaling, double[] x_scaling, double[] g_scaling)
         {
-            unsafe
-            {
-                fixed (double* p_x_scaling = x_scaling, p_g_scaling = g_scaling)
-                {
-                    return SetIpoptProblemScaling(m_problem, obj_scaling, p_x_scaling, p_g_scaling) == TRUE;
-                }
-            }
-
+            return SetIpoptProblemScaling(m_problem, obj_scaling, x_scaling, g_scaling) == TRUE;
         }
 
         /// <summary>
@@ -504,11 +383,8 @@ namespace Cureos.Numerics
         /// <returns>true if the callback function could be set successfully, false otherwise</returns>
         public bool SetIntermediateCallback(IntermediateDelegate intermediate)
         {
-            unsafe
-            {
-                m_intermediate = new IntermediateReporter(intermediate).Report;
-                return SetIntermediateCallback(m_problem, m_intermediate) == TRUE;
-            }
+            m_intermediate = new IntermediateReporter(intermediate).Report;
+            return SetIntermediateCallback(m_problem, m_intermediate) == TRUE;
         }
 
         /// <summary>
@@ -524,89 +400,27 @@ namespace Cureos.Numerics
         /// <returns>Outcome of the optimization procedure (e.g., success, failure etc).</returns>
         public IpoptReturnCode SolveProblem(double[] x, out double obj_val, double[] g, double[] mult_g, double[] mult_x_L, double[] mult_x_U)
         {
-            unsafe
-            {
-                fixed (double* p_obj_val = &obj_val, p_x = x, p_g = g, p_mult_g = mult_g, p_mult_x_L = mult_x_L, p_mult_x_U = mult_x_U)
-                {
-                    return (IpoptReturnCode)IpoptSolve(m_problem, p_x, p_g, p_obj_val, p_mult_g, p_mult_x_L, p_mult_x_U, null);
-                }
-            }
+            return (IpoptReturnCode)IpoptSolve(m_problem, x, g, out obj_val, mult_g, mult_x_L, mult_x_U, IntPtr.Zero);
         }
 
         #endregion
 
         #region PRIVATE METHODS
 
-        private void DisposeImpl()
+        private void Dispose(bool disposing)
         {
             if (!m_disposed)
             {
                 FreeIpoptProblem(m_problem);
-                m_problem = IntPtr.Zero;
+
+                if (disposing)
+                {
+                    m_problem = IntPtr.Zero;
+                }
+
                 m_disposed = true;
             }
         }
-
-        unsafe private static void CopyToPointer(int n, double[] x, double* p_x)
-        {
-            if (x != null && p_x != null) Marshal.Copy(x, 0, (IntPtr)p_x, n);
-        }
-
-        unsafe private static void CopyToPointer(int n, int[] x, int* p_x)
-        {
-            if (x != null && p_x != null) Marshal.Copy(x, 0, (IntPtr)p_x, n);
-        }
-
-        unsafe private static double[] CreateArray(int n, double* p_x)
-        {
-            if (p_x == null) return null;
-
-            double[] x = new double[n];
-            Marshal.Copy((IntPtr)p_x, x, 0, n);
-            return x;
-        }
-
-        unsafe private static int[] CreateArray(int n, int* p_x)
-        {
-            if (p_x == null) return null;
-
-            int[] x = new int[n];
-            Marshal.Copy((IntPtr)p_x, x, 0, n);
-            return x;
-        }
-
-        #endregion
-
-        #region DLL METHOD DECLARATIONS
-
-        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        unsafe private static extern IntPtr CreateIpoptProblem(int n, double* x_L, double* x_U, int m, double* g_L, double* g_U,  int nele_jac, 
-            int nele_hess, int index_style, Eval_F_CB eval_f, Eval_G_CB eval_g, Eval_Grad_F_CB eval_grad_f, Eval_Jac_G_CB eval_jac_g, Eval_H_CB eval_h);
-
-        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void FreeIpoptProblem(IntPtr ipopt_problem);
-
-        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int AddIpoptStrOption(IntPtr ipopt_problem, string keyword, string val);
-
-        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int AddIpoptNumOption(IntPtr ipopt_problem, string keyword, double val);
-
-        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int AddIpoptIntOption(IntPtr ipopt_problem, string keyword, int val);
-
-        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int OpenIpoptOutputFile(IntPtr ipopt_problem, string file_name, int print_level);
-
-        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        unsafe private static extern int SetIpoptProblemScaling(IntPtr ipopt_problem, double obj_scaling, double* x_scaling, double* g_scaling);
-
-        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int SetIntermediateCallback(IntPtr ipopt_problem, Intermediate_CB intermediate_cb);
-
-        [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        unsafe private static extern int IpoptSolve(
-            IntPtr ipopt_problem, double* x, double* g, double* obj_val, double* mult_g, double* mult_x_L, double* mult_x_U, void* user_data);
 
         #endregion
     }

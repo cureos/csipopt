@@ -1,7 +1,7 @@
-﻿// Copyright (C) 2010 Anders Gustafsson and others. All Rights Reserved.
+﻿// Copyright (C) 2010-2011 Anders Gustafsson and others. All Rights Reserved.
 // This code is published under the Eclipse Public License.
 //
-// Author:  Anders Gustafsson, Cureos AB 2010-12-07
+// Author:  Anders Gustafsson, Cureos AB 2011-12-13
 
 using System;
 using Cureos.Numerics;
@@ -28,6 +28,7 @@ namespace hs071_cs
             Ipopt.AddIpoptOption(problem, "tol", 1e-7);
             Ipopt.AddIpoptOption(problem, "mu_strategy", "adaptive");
             Ipopt.AddIpoptOption(problem, "output_file", "hs071.txt");
+            Ipopt.AddIpoptOption(problem, "print_user_options", "yes");
 #if INTERMEDIATE
             Ipopt.SetIntermediateCallback(problem, p.intermediate);
 #endif

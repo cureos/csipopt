@@ -1,1 +1,1 @@
-csc /unsafe /target:library /out:Cureos.Numerics.dll Ipopt.cs
+csc /target:library /out:Cureos.Numerics.dll IpoptInterop.cs IpoptAdapter.cs IpoptAlgorithmMode.cs IpoptReturnCode.cs

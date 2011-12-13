@@ -55,8 +55,17 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\SafeIpopt.cs">
-      <Link>SafeIpopt.cs</Link>
+    <Compile Include="..\..\IpoptAdapter.cs">
+      <Link>IpoptAdapter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\IpoptAlgorithmMode.cs">
+      <Link>IpoptAlgorithmMode.cs</Link>
+    </Compile>
+    <Compile Include="..\..\IpoptInterop.cs">
+      <Link>IpoptInterop.cs</Link>
+    </Compile>
+    <Compile Include="..\..\IpoptReturnCode.cs">
+      <Link>IpoptReturnCode.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

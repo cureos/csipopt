@@ -1,16 +1,18 @@
-csipopt
-=======
+= csipopt
+
 Developed by Anders Gustafsson, anders dot 9ustafsson at gmail dot com.
 Published under the Eclipse Public License.
 
-Introduction
-------------
+
+== Introduction
+
 csipopt provides a small and simple C# interface to the Ipopt non-linear optimizer. If the interface is
 contained in a .NET class library, the interface is accessible via any .NET language. .NET Framework 2.0
 or higher is required.
 
-Prerequisites
--------------
+
+== Prerequisites
+
 To successfully run an application calling the C# Ipopt interface, a dynamic linked library of Ipopt is 
 additionally required. Pre-compiled libraries can be downloaded from the following location: 
 http://www.coin-or.org/download/binary/Ipopt/
@@ -23,17 +25,17 @@ Ipopt39.dll in the same folder as the project source code.
 (Note! The actual name of the DLL is of course dependent upon which version of Ipopt libraries you are 
 downloading.)
 
-Usage
------
-To use the C# interface in your own code, simply copy the file Ipopt.cs to your class library. 
-(Potentially, you may need to edit the references to Ipopt39.) The class library must be compiled 
-using the /unsafe directive. Other class libraries and applications accessing the class library with 
-the C# Ipopt interface do not require the /unsafe directive.
+
+== Usage
+
+To use the C# interface in your own code, simply copy the C# files Ipopt*.cs to your class library. 
+(Potentially, you may need to edit the references to Ipopt39.) 
 
 A number of build scripts are provided to demonstrate example usage of the C# Ipopt interface.
 
-Visual Studio examples
-----------------------
+
+=== Visual Studio examples
+
 When running from the Visual Studio command prompt, create a class library by running the batch script
 
 	build_library
@@ -60,8 +62,8 @@ To run the respective applications, type
 	hs071_vb
 	hs071_fs
 
-Mono examples
--------------
+=== Mono examples
+
 The interface is equally applicable to Mono, and can be compiled using the gmcs compiler.
 When running from the Mono command prompt, create a class library by running the batch script
 
@@ -76,5 +78,5 @@ To run the example application, type
 	mono hs071_cs
 
 
-=======
-This file was last modified by Anders Gustafsson, 2010-12-08.
+
+This file was last modified by Anders Gustafsson, 2011-12-13.
