@@ -1,6 +1,6 @@
 = csipopt
 
-Developed by Anders Gustafsson, anders dot 9ustafsson at gmail dot com.
+Copyright (c) 2010-2011 Anders Gustafsson, Cureos AB.
 Published under the Eclipse Public License.
 
 
@@ -18,7 +18,7 @@ additionally required. Pre-compiled libraries can be downloaded from the followi
 http://www.coin-or.org/download/binary/Ipopt/
 
 Download binaries suitable for your platform, unpack the compressed Ipopt binary archive, from the folder 
-.\lib\PLATFORM\release (where PLATFORM is win32 or x64) copy the Ipopt39.dll file and place it in a folder 
+./lib/PLATFORM/release (where PLATFORM is win32 or x64) copy the Ipopt39.dll file and place it in a folder 
 that is accessible from the system path. To run the example applications in this project, place the 
 Ipopt39.dll in the same folder as the project source code.
 
@@ -38,45 +38,46 @@ A number of build scripts are provided to demonstrate example usage of the C# Ip
 
 When running from the Visual Studio command prompt, create a class library by running the batch script
 
-	build_library
+  build_library
 
 Create an example application from the C# file Program.cs by running the batch script
 
-	build_hs071_cs
+  build_hs071_cs
 
 There is an alternative C# build script enforcing the intermediate callback method (introduced in 
 Ipopt 3.9) to be utilized. To create an example application using the intermediate callback method, run
 
-	build_hs071_cs_with_intermediate
+  build_hs071_cs_with_intermediate
 
 Analogously, create an example application from the Visual Basic file Program.vb or F# file Program.fs
 by running either of the batch scripts
 
-	build_hs071_vb
-	build_hs071_fs
+  build_hs071_vb
+  build_hs071_fs
 
 To run the respective applications, type
 
-	hs071_cs
-	hs071_cs_intermediate
-	hs071_vb
-	hs071_fs
+  hs071_cs
+  hs071_cs_intermediate
+  hs071_vb
+  hs071_fs
 
 === Mono examples
 
 The interface is equally applicable to Mono, and can be compiled using the gmcs compiler.
 When running from the Mono command prompt, create a class library by running the batch script
 
-	build_library_with_mono
+  build_library_with_mono
 
 Create an example application from the C# file Program.cs by running the batch script
 
-	build_hs071_cs_with_mono
+  build_hs071_cs_with_mono
 
 To run the example application, type
 
-	mono hs071_cs
+  mono hs071_cs
 
 
+== Revision
 
-This file was last modified by Anders Gustafsson, 2011-12-13.
+Last updated on December 14, 2011 by Anders Gustafsson, anders[at]cureos[dot]com, http://www.cureos.com.
