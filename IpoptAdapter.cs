@@ -126,9 +126,9 @@ namespace Cureos.Numerics
             }
 
             [AllowReversePInvokeCalls]
-            internal int Evaluate(int n, double[] x, int new_x, out double obj_value, IntPtr user_data)
+            internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr user_data)
             {
-                return m_eval_f(n, x, new_x == TRUE, out obj_value) ? TRUE : FALSE;
+                return m_eval_f(n, x, new_x == IpoptBoolType.True, out obj_value) ? IpoptBoolType.True : IpoptBoolType.False;
             }
         }
 
@@ -142,9 +142,9 @@ namespace Cureos.Numerics
             }
 
             [AllowReversePInvokeCalls]
-            internal int Evaluate(int n, double[] x, int new_x, int m, double[] g, IntPtr user_data)
+            internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr user_data)
             {
-                return m_eval_g(n, x, new_x == TRUE, m, g) ? TRUE : FALSE;
+                return m_eval_g(n, x, new_x == IpoptBoolType.True, m, g) ? IpoptBoolType.True : IpoptBoolType.False;
             }
         }
 
@@ -158,9 +158,9 @@ namespace Cureos.Numerics
             }
 
             [AllowReversePInvokeCalls]
-            internal int Evaluate(int n, double[] x, int new_x, double[] grad_f, IntPtr user_data)
+            internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr user_data)
             {
-                return m_eval_grad_f(n, x, new_x == TRUE, grad_f) ? TRUE : FALSE;
+                return m_eval_grad_f(n, x, new_x == IpoptBoolType.True, grad_f) ? IpoptBoolType.True : IpoptBoolType.False;
             }
         }
 
@@ -174,9 +174,12 @@ namespace Cureos.Numerics
             }
 
             [AllowReversePInvokeCalls]
-            internal int Evaluate(int n, double[] x, int new_x, int m, int nele_jac, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
+            internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac, 
+                int[] iRow, int[] jCol, double[] values, IntPtr user_data)
             {
-                return m_eval_jac_g(n, x, new_x == TRUE, m, nele_jac, iRow, jCol, values) ? TRUE : FALSE;
+                return m_eval_jac_g(n, x, new_x == IpoptBoolType.True, m, nele_jac, iRow, jCol, values)
+                           ? IpoptBoolType.True
+                           : IpoptBoolType.False;
             }
         }
 
@@ -190,10 +193,13 @@ namespace Cureos.Numerics
             }
 
             [AllowReversePInvokeCalls]
-            internal int Evaluate(int n, double[] x, int new_x, double obj_factor, int m, double[] lambda, int new_lambda, int nele_hess,
-                int[] iRow, int[] jCol, double[] values, IntPtr user_data)
+            internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda, 
+                IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
             {
-                return m_eval_h(n, x, new_x == TRUE, obj_factor, m, lambda, new_lambda == TRUE, nele_hess, iRow, jCol, values) ? TRUE : FALSE;
+                return m_eval_h(n, x, new_x == IpoptBoolType.True, obj_factor, m, lambda,
+                                new_lambda == IpoptBoolType.True, nele_hess, iRow, jCol, values)
+                           ? IpoptBoolType.True
+                           : IpoptBoolType.False;
             }
         }
 

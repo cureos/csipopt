@@ -43,35 +43,36 @@ namespace Cureos.Numerics
         }
 
         [AllowReversePInvokeCalls]
-        public int eval_f(int n, double[] x, int new_x, out double obj_value, IntPtr user_data)
+        public IpoptBoolType eval_f(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr user_data)
         {
             obj_value = x[0] * x[3] * (x[0] + x[1] + x[2]) + x[2];
 
-            return Ipopt.TRUE;
+            return IpoptBoolType.True;
         }
 
         [AllowReversePInvokeCalls]
-        public int eval_grad_f(int n, double[] x, int new_x, double[] grad_f, IntPtr user_data)
+        public IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr user_data)
         {
             grad_f[0] = x[0] * x[3] + x[3] * (x[0] + x[1] + x[2]);
             grad_f[1] = x[0] * x[3];
             grad_f[2] = x[0] * x[3] + 1;
             grad_f[3] = x[0] * (x[0] + x[1] + x[2]);
 
-            return Ipopt.TRUE;
+            return IpoptBoolType.True;
         }
 
         [AllowReversePInvokeCalls]
-        public int eval_g(int n, double[] x, int new_x, int m, double[] g, IntPtr user_data)
+        public IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr user_data)
         {
             g[0] = x[0] * x[1] * x[2] * x[3];
             g[1] = x[0] * x[0] + x[1] * x[1] + x[2] * x[2] + x[3] * x[3];
 
-            return Ipopt.TRUE;
+            return IpoptBoolType.True;
         }
 
         [AllowReversePInvokeCalls]
-        public int eval_jac_g(int n, double[] x, int new_x, int m, int nele_jac, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
+        public IpoptBoolType eval_jac_g(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac, 
+            int[] iRow, int[] jCol, double[] values, IntPtr user_data)
         {
             if (values == null)
             {
@@ -110,14 +111,12 @@ namespace Cureos.Numerics
                 values[7] = 2 * x[3];         /* 1,3 */
             }
 
-            return Ipopt.TRUE;
+            return IpoptBoolType.True;
         }
 
         [AllowReversePInvokeCalls]
-        public int eval_h(int n, double[] x, int new_x, double obj_factor,
-                    int m, double[] lambda, int new_lambda,
-                    int nele_hess, int[] iRow, int[] jCol,
-                    double[] values, IntPtr user_data)
+        public IpoptBoolType eval_h(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda, 
+            IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
         {
             if (values == null)
             {
@@ -178,7 +177,7 @@ namespace Cureos.Numerics
                 values[9] += lambda[1] * 2;                      /* 3,3 */
             }
 
-            return Ipopt.TRUE;
+            return IpoptBoolType.True;
         }
 
 #if INTERMEDIATE

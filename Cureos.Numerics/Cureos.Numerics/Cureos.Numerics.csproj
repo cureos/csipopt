@@ -97,6 +97,12 @@
     <Compile Include="..\..\IpoptAlgorithmMode.cs">
       <Link>IpoptAlgorithmMode.cs</Link>
     </Compile>
+    <Compile Include="..\..\IpoptBoolType.cs">
+      <Link>IpoptBoolType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\IpoptIndexStyle.cs">
+      <Link>IpoptIndexStyle.cs</Link>
+    </Compile>
     <Compile Include="..\..\IpoptInterop.cs">
       <Link>IpoptInterop.cs</Link>
     </Compile>

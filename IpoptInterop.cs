@@ -8,28 +8,6 @@ using System.Runtime.InteropServices;
 
 namespace Cureos.Numerics
 {
-    #region ENUMERATIONS
-
-    /// <summary>
-    /// Enumeration of the available boolean return types from C Ipopt.
-    /// </summary>
-    public enum IpoptBoolType
-    {
-        False = 0,
-        True = 1
-    }
-
-    /// <summary>
-    /// Enumeration of the available index styles for the Jacobian and Hessian index arrays.
-    /// </summary>
-    public enum IpoptIndexStyle
-    {
-        C = 0,
-        Fortran = 1
-    }
-
-    #endregion
-
     public sealed partial class Ipopt
     {
         #region FIELDS
@@ -48,9 +26,6 @@ namespace Cureos.Numerics
         /// </summary>
         public const double NegativeInfinity = -2.0e19;
 
-        public const int TRUE = 1;
-        public const int FALSE = 0;
-
         #endregion
 
         #region CALLBACK FUNCTION DELEGATES
@@ -68,9 +43,9 @@ namespace Cureos.Numerics
         /// <returns>true if evaluation succeeded, false otherwise</returns>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I4)]
-        public delegate int Eval_F_CB(
+        public delegate IpoptBoolType Eval_F_CB(
         [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-        [MarshalAs(UnmanagedType.I4)] int new_x, [MarshalAs(UnmanagedType.R8)] out double obj_value, IntPtr user_data);
+        [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.R8)] out double obj_value, IntPtr user_data);
 
         /// <summary>
         /// Delegate defining the callback function for evaluating the gradient of
@@ -85,9 +60,9 @@ namespace Cureos.Numerics
         /// <returns>true if evaluation succeeded, false otherwise</returns>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I4)]
-        public delegate int Eval_Grad_F_CB(
+        public delegate IpoptBoolType Eval_Grad_F_CB(
         [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-        [MarshalAs(UnmanagedType.I4)] int new_x, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] grad_f,
+        [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] grad_f,
         IntPtr user_data);
 
         /// <summary>
@@ -104,9 +79,9 @@ namespace Cureos.Numerics
         /// <returns>true if evaluation succeeded, false otherwise</returns>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I4)]
-        public delegate int Eval_G_CB(
+        public delegate IpoptBoolType Eval_G_CB(
         [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-        [MarshalAs(UnmanagedType.I4)] int new_x, [MarshalAs(UnmanagedType.I4)] int m,
+        [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.I4)] int m,
         [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] double[] g, IntPtr user_data);
 
         /// <summary>
@@ -126,9 +101,10 @@ namespace Cureos.Numerics
         /// <returns>true if evaluation succeeded, false otherwise</returns>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I4)]
-        public delegate int Eval_Jac_G_CB(
+        public delegate IpoptBoolType Eval_Jac_G_CB(
         [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-        [MarshalAs(UnmanagedType.I4)] int new_x, [MarshalAs(UnmanagedType.I4)] int m, [MarshalAs(UnmanagedType.I4)] int nele_jac,
+        [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.I4)] int m, 
+        [MarshalAs(UnmanagedType.I4)] int nele_jac,
         [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] iRow,
         [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] jCol,
         [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] values, IntPtr user_data);
@@ -153,11 +129,11 @@ namespace Cureos.Numerics
         /// <returns>true if evaluation succeeded, false otherwise</returns>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I4)]
-        public delegate int Eval_H_CB(
+        public delegate IpoptBoolType Eval_H_CB(
         [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-        [MarshalAs(UnmanagedType.I4)] int new_x, [MarshalAs(UnmanagedType.R8)] double obj_factor, [MarshalAs(UnmanagedType.I4)] int m,
-        [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] lambda, [MarshalAs(UnmanagedType.I4)] int new_lambda,
-        [MarshalAs(UnmanagedType.I4)] int nele_hess,
+        [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.R8)] double obj_factor, 
+        [MarshalAs(UnmanagedType.I4)] int m, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] lambda, 
+        [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_lambda, [MarshalAs(UnmanagedType.I4)] int nele_hess,
         [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] iRow,
         [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] jCol,
         [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] double[] values, IntPtr user_data);
