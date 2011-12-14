@@ -74,6 +74,9 @@
     <Compile Include="..\..\HS071.cs">
       <Link>HS071.cs</Link>
     </Compile>
+    <Compile Include="..\..\RosenbrockPostOffice.cs">
+      <Link>RosenbrockPostOffice.cs</Link>
+    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>

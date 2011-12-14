@@ -8,6 +8,6 @@
 
     <StackPanel x:Name="LayoutRoot" Background="White">
         <Button x:Name="StartOptButton" Content="Click to start HS071 optimization" Click="StartOptButton_Click"/>
-        <TextBox x:Name="OptOutputTextBox" IsReadOnly="True" Height="200" />
+        <TextBox x:Name="OptOutputTextBox" IsReadOnly="True" Height="300" />
     </StackPanel>
 </UserControl>
