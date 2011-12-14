@@ -25,16 +25,15 @@ namespace hs071_cs
 
             // Set some options.  The following ones are only examples,
             // they might not be suitable for your problem.
-            Ipopt.AddIpoptOption(problem, "tol", 1e-7);
-            Ipopt.AddIpoptOption(problem, "mu_strategy", "adaptive");
-            Ipopt.AddIpoptOption(problem, "output_file", "hs071.txt");
-            Ipopt.AddIpoptOption(problem, "print_user_options", "yes");
+            Ipopt.AddIpoptNumOption(problem, "tol", 1e-7);
+            Ipopt.AddIpoptStrOption(problem, "mu_strategy", "adaptive");
+            Ipopt.AddIpoptStrOption(problem, "output_file", "hs071.txt");
+            Ipopt.AddIpoptStrOption(problem, "print_user_options", "yes");
 #if INTERMEDIATE
             Ipopt.SetIntermediateCallback(problem, p.intermediate);
 #endif
             // Solve the problem.
-            IpoptReturnCode status =
-                (IpoptReturnCode)Ipopt.IpoptSolve(problem, x, null, out obj, null, null, null, IntPtr.Zero);
+            var status = Ipopt.IpoptSolve(problem, x, null, out obj, null, null, null, IntPtr.Zero);
 
             // Free problem resources.
             Ipopt.FreeIpoptProblem(problem);

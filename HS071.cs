@@ -183,12 +183,12 @@ namespace Cureos.Numerics
 
 #if INTERMEDIATE
         [AllowReversePInvokeCalls]
-        public int intermediate(int alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
+        public IpoptBoolType intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
             double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
         {
             Console.WriteLine("Intermediate callback method at iteration {0} in {1} with d_norm {2}",
-                iter_count, (IpoptAlgorithmMode)alg_mod, d_norm);
-            return iter_count < 5 ? Ipopt.TRUE : Ipopt.FALSE;
+                iter_count, alg_mod, d_norm);
+            return iter_count < 5 ? IpoptBoolType.True : IpoptBoolType.False;
         }
 #endif
     }

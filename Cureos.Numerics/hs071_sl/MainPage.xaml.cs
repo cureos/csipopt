@@ -29,20 +29,20 @@ namespace hs071_sl
             try
             {
                 double obj;
-                var problem = CsIpopt.CreateIpoptProblem(p._n, p._x_L, p._x_U, p._m, p._g_L, p._g_U, p._nele_jac,
-                                                         p._nele_hess, 0,
+                var problem = Ipopt.CreateIpoptProblem(p._n, p._x_L, p._x_U, p._m, p._g_L, p._g_U, p._nele_jac,
+                                                         p._nele_hess, IpoptIndexStyle.C,
                                                          p.eval_f, p.eval_g, p.eval_grad_f, p.eval_jac_g, p.eval_h);
 
                 // Set some options.  The following ones are only examples,
                 // they might not be suitable for your problem.
-                CsIpopt.AddIpoptOption(problem, "tol", 1e-7);
-                CsIpopt.AddIpoptOption(problem, "mu_strategy", "adaptive");
+                Ipopt.AddIpoptNumOption(problem, "tol", 1e-7);
+                Ipopt.AddIpoptStrOption(problem, "mu_strategy", "adaptive");
 
                 // Solve the problem.
-                IpoptReturnCode status = (IpoptReturnCode)CsIpopt.IpoptSolve(problem, x, null, out obj, null, null, null, IntPtr.Zero);
+                var status = Ipopt.IpoptSolve(problem, x, null, out obj, null, null, null, IntPtr.Zero);
 
                 // Free problem resources.
-                CsIpopt.FreeIpoptProblem(problem);
+                Ipopt.FreeIpoptProblem(problem);
 
                 var output = new StringBuilder();
                 output.AppendFormat("Optimization return status: {0}{1}{1}", status, Environment.NewLine);

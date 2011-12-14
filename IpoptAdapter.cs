@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2010 Anders Gustafsson and others. All Rights Reserved.
+﻿// Copyright (C) 2010-2011 Anders Gustafsson and others. All Rights Reserved.
 // This code is published under the Eclipse Public License.
 //
 // Author:  Anders Gustafsson, Cureos AB 2011-12-13
@@ -207,11 +207,11 @@ namespace Cureos.Numerics
             }
 
             [AllowReversePInvokeCalls]
-            internal int Report(int alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
+            internal IpoptBoolType Report(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
                 double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
             {
-                return m_intermediate((IpoptAlgorithmMode)alg_mod, iter_count, obj_value, inf_pr, inf_du, mu, d_norm, 
-                    regularization_size, alpha_du, alpha_pr, ls_trials) ? TRUE : FALSE;
+                return m_intermediate(alg_mod, iter_count, obj_value, inf_pr, inf_du, mu, d_norm, 
+                    regularization_size, alpha_du, alpha_pr, ls_trials) ? IpoptBoolType.True : IpoptBoolType.False;
             }
         }
 
@@ -275,7 +275,7 @@ namespace Cureos.Numerics
             m_eval_h = new HessianEvaluator(eval_h).Evaluate;
             m_intermediate = null;
 
-            m_problem = CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, 0,
+            m_problem = CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, IpoptIndexStyle.C,
                                            m_eval_f, m_eval_g, m_eval_grad_f, m_eval_jac_g, m_eval_h);
 
             if (m_problem == IntPtr.Zero)
@@ -315,7 +315,7 @@ namespace Cureos.Numerics
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
         public bool AddOption(string keyword, string val)
         {
-            return AddIpoptOption(m_problem, keyword, val) == TRUE;
+            return AddIpoptStrOption(m_problem, keyword, val) == IpoptBoolType.True;
         }
 
         /// <summary>
@@ -326,7 +326,7 @@ namespace Cureos.Numerics
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
         public bool AddOption(string keyword, double val)
         {
-            return AddIpoptOption(m_problem, keyword, val) == TRUE;
+            return AddIpoptNumOption(m_problem, keyword, val) == IpoptBoolType.True;
         }
 
         /// <summary>
@@ -337,7 +337,7 @@ namespace Cureos.Numerics
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
         public bool AddOption(string keyword, int val)
         {
-            return AddIpoptOption(m_problem, keyword, val) == TRUE;
+            return AddIpoptIntOption(m_problem, keyword, val) == IpoptBoolType.True;
         }
 
 #if !SILVERLIGHT
@@ -349,7 +349,7 @@ namespace Cureos.Numerics
         /// <returns>False, if there was a problem opening the file.</returns>
         public bool OpenOutputFile(string file_name, int print_level)
         {
-            return OpenIpoptOutputFile(m_problem, file_name, print_level) == TRUE;
+            return OpenIpoptOutputFile(m_problem, file_name, print_level) == IpoptBoolType.True;
         }
 #endif
 
@@ -365,7 +365,7 @@ namespace Cureos.Numerics
         /// <returns>true if scaling succeeded, false otherwise</returns>
         public bool SetScaling(double obj_scaling, double[] x_scaling, double[] g_scaling)
         {
-            return SetIpoptProblemScaling(m_problem, obj_scaling, x_scaling, g_scaling) == TRUE;
+            return SetIpoptProblemScaling(m_problem, obj_scaling, x_scaling, g_scaling) == IpoptBoolType.True;
         }
 
         /// <summary>
@@ -384,7 +384,7 @@ namespace Cureos.Numerics
         public bool SetIntermediateCallback(IntermediateDelegate intermediate)
         {
             m_intermediate = new IntermediateReporter(intermediate).Report;
-            return SetIntermediateCallback(m_problem, m_intermediate) == TRUE;
+            return SetIntermediateCallback(m_problem, m_intermediate) == IpoptBoolType.True;
         }
 
         /// <summary>
@@ -400,7 +400,7 @@ namespace Cureos.Numerics
         /// <returns>Outcome of the optimization procedure (e.g., success, failure etc).</returns>
         public IpoptReturnCode SolveProblem(double[] x, out double obj_val, double[] g, double[] mult_g, double[] mult_x_L, double[] mult_x_U)
         {
-            return (IpoptReturnCode)IpoptSolve(m_problem, x, g, out obj_val, mult_g, mult_x_L, mult_x_U, IntPtr.Zero);
+            return IpoptSolve(m_problem, x, g, out obj_val, mult_g, mult_x_L, mult_x_U, IntPtr.Zero);
         }
 
         #endregion
