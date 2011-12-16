@@ -8,170 +8,158 @@ using System.Runtime.InteropServices;
 
 namespace Cureos.Numerics
 {
-    public sealed partial class Ipopt
+    #region CALLBACK FUNCTION DELEGATES
+
+    /// <summary>
+    /// Delegate defining the callback function for evaluating the value of
+    /// the objective function.  Return value should be set to false if
+    /// there was a problem doing the evaluation.
+    /// </summary>
+    /// <param name="n">Number of problem variables</param>
+    /// <param name="x">Problem variables</param>
+    /// <param name="new_x">true if problem variables are new for this call, false otherwise</param>
+    /// <param name="obj_value">Evaluated objective function value</param>
+    /// <param name="user_data">Optional pointer to user defined data</param>
+    /// <returns>true if evaluation succeeded, false otherwise</returns>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I4)]
+    public delegate IpoptBoolType Eval_F_CB(
+    [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
+    [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.R8)] out double obj_value, IntPtr user_data);
+
+    /// <summary>
+    /// Delegate defining the callback function for evaluating the gradient of
+    /// the objective function.  Return value should be set to false if
+    /// there was a problem doing the evaluation.
+    /// </summary>
+    /// <param name="n">Number of problem variables</param>
+    /// <param name="x">Problem variables</param>
+    /// <param name="new_x">true if problem variables are new for this call, false otherwise</param>
+    /// <param name="grad_f">Objective function gradient</param>
+    /// <param name="user_data">Optional pointer to user defined data</param>
+    /// <returns>true if evaluation succeeded, false otherwise</returns>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I4)]
+    public delegate IpoptBoolType Eval_Grad_F_CB(
+    [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
+    [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] grad_f,
+    IntPtr user_data);
+
+    /// <summary>
+    /// Delegate defining the callback function for evaluating the value of
+    /// the constraint functions.  Return value should be set to false if
+    /// there was a problem doing the evaluation.
+    /// </summary>
+    /// <param name="n">Number of problem variables</param>
+    /// <param name="x">Problem variables</param>
+    /// <param name="new_x">true if problem variables are new for this call, false otherwise</param>
+    /// <param name="m">Number of constraint functions</param>
+    /// <param name="g">Calculated values of the constraint functions</param>
+    /// <param name="user_data">Optional pointer to user defined data</param>
+    /// <returns>true if evaluation succeeded, false otherwise</returns>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I4)]
+    public delegate IpoptBoolType Eval_G_CB(
+    [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
+    [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.I4)] int m,
+    [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] double[] g, IntPtr user_data);
+
+    /// <summary>
+    /// Delegate defining the callback function for evaluating the Jacobian of
+    /// the constraint functions.  Return value should be set to false if
+    /// there was a problem doing the evaluation.
+    /// </summary>
+    /// <param name="n">Number of problem variables</param>
+    /// <param name="x">Problem variables</param>
+    /// <param name="new_x">true if problem variables are new for this call, false otherwise</param>
+    /// <param name="m">Number of constraint functions</param>
+    /// <param name="nele_jac">Number of non-zero elements in the Jacobian</param>
+    /// <param name="iRow">Row indices of the non-zero Jacobian elements, defined here if values is null</param>
+    /// <param name="jCol">Column indices of the non-zero Jacobian elements, defined here if values is null</param>
+    /// <param name="values">Values of the non-zero Jacobian elements</param>
+    /// <param name="user_data">Optional pointer to user defined data</param>
+    /// <returns>true if evaluation succeeded, false otherwise</returns>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I4)]
+    public delegate IpoptBoolType Eval_Jac_G_CB(
+    [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
+    [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.I4)] int m,
+    [MarshalAs(UnmanagedType.I4)] int nele_jac,
+    [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] iRow,
+    [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] jCol,
+    [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] values, IntPtr user_data);
+
+    /// <summary>
+    /// Delegate defining the callback function for evaluating the Hessian of
+    /// the Lagrangian function.  Return value should be set to false if
+    /// there was a problem doing the evaluation.
+    /// </summary>
+    /// <param name="n">Number of problem variables</param>
+    /// <param name="x">Problem variables</param>
+    /// <param name="new_x">true if problem variables are new for this call, false otherwise</param>
+    /// <param name="obj_factor">Multiplier for the objective function in the Lagrangian</param>
+    /// <param name="m">Number of constraint functions</param>
+    /// <param name="lambda">Multipliers for the constraint functions in the Lagrangian</param>
+    /// <param name="new_lambda">true if lambda values are new for this call, false otherwise</param>
+    /// <param name="nele_hess">Number of non-zero elements in the Hessian</param>
+    /// <param name="iRow">Row indices of the non-zero Hessian elements, defined here if values is null</param>
+    /// <param name="jCol">Column indices of the non-zero Hessian elements, defined here if values is null</param>
+    /// <param name="values">Values of the non-zero Hessian elements</param>
+    /// <param name="user_data">Optional pointer to user defined data</param>
+    /// <returns>true if evaluation succeeded, false otherwise</returns>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I4)]
+    public delegate IpoptBoolType Eval_H_CB(
+    [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
+    [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.R8)] double obj_factor,
+    [MarshalAs(UnmanagedType.I4)] int m, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] lambda,
+    [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_lambda, [MarshalAs(UnmanagedType.I4)] int nele_hess,
+    [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] iRow,
+    [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] jCol,
+    [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] double[] values, IntPtr user_data);
+
+    /// <summary>
+    /// Delegate defining the callback function for giving intermediate
+    /// execution control to the user.  If set, it is called once per
+    /// iteration, providing the user with some information on the state
+    /// of the optimization.  This can be used to print some
+    /// user-defined output.  It also gives the user a way to terminate
+    /// the optimization prematurely.  If this method returns false,
+    /// Ipopt will terminate the optimization.
+    /// </summary>
+    /// <param name="alg_mod">Current Ipopt algorithm mode</param>
+    /// <param name="iter_count">Current iteration count</param>
+    /// <param name="obj_value">The unscaled objective value at the current point</param>
+    /// <param name="inf_pr">The scaled primal infeasibility at the current point</param>
+    /// <param name="inf_du">The scaled dual infeasibility at the current point</param>
+    /// <param name="mu">The barrier parameter value at the current point</param>
+    /// <param name="d_norm">The infinity norm (max) of the primal step 
+    /// (for the original variables x and the internal slack variables s)</param>
+    /// <param name="regularization_size">Value of the regularization term for the Hessian of the Lagrangian 
+    /// in the augmented system</param>
+    /// <param name="alpha_du">The stepsize for the dual variables</param>
+    /// <param name="alpha_pr">The stepsize for the primal variables</param>
+    /// <param name="ls_trials">The number of backtracking line search steps</param>
+    /// <param name="user_data">Optional pointer to user defined data</param>
+    /// <returns>true if the optimization should proceeded after callback return, false if
+    /// the optimization should be terminated prematurely</returns>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I4)]
+    public delegate IpoptBoolType Intermediate_CB(
+    [MarshalAs(UnmanagedType.I4)] IpoptAlgorithmMode alg_mod, [MarshalAs(UnmanagedType.I4)] int iter_count,
+    [MarshalAs(UnmanagedType.R8)] double obj_value, [MarshalAs(UnmanagedType.R8)] double inf_pr,
+    [MarshalAs(UnmanagedType.R8)] double inf_du, [MarshalAs(UnmanagedType.R8)] double mu,
+    [MarshalAs(UnmanagedType.R8)] double d_norm, [MarshalAs(UnmanagedType.R8)] double regularization_size,
+    [MarshalAs(UnmanagedType.R8)] double alpha_du, [MarshalAs(UnmanagedType.R8)] double alpha_pr,
+    [MarshalAs(UnmanagedType.I4)] int ls_trials, IntPtr user_data);
+
+    #endregion
+
+    public static class IpoptAdapter
     {
         #region FIELDS
 
         private const string IpoptDllName = "Ipopt39";
-
-        /// <summary>
-        /// Value to indicate that a variable or constraint function has no upper bound 
-        /// (provided that IPOPT option "nlp_upper_bound_inf" is less than 2e19)
-        /// </summary>
-        public const double PositiveInfinity =  2.0e19;
-
-        /// <summary>
-        /// Value to indicate that a variable or constraint function has no lower bound 
-        /// (provided that IPOPT option "nlp_lower_bound_inf" is greater than -2e19)
-        /// </summary>
-        public const double NegativeInfinity = -2.0e19;
-
-        #endregion
-
-        #region CALLBACK FUNCTION DELEGATES
-
-        /// <summary>
-        /// Delegate defining the callback function for evaluating the value of
-        /// the objective function.  Return value should be set to false if
-        /// there was a problem doing the evaluation.
-        /// </summary>
-        /// <param name="n">Number of problem variables</param>
-        /// <param name="x">Problem variables</param>
-        /// <param name="new_x">true if problem variables are new for this call, false otherwise</param>
-        /// <param name="obj_value">Evaluated objective function value</param>
-        /// <param name="user_data">Optional pointer to user defined data</param>
-        /// <returns>true if evaluation succeeded, false otherwise</returns>
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
-        public delegate IpoptBoolType Eval_F_CB(
-        [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-        [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.R8)] out double obj_value, IntPtr user_data);
-
-        /// <summary>
-        /// Delegate defining the callback function for evaluating the gradient of
-        /// the objective function.  Return value should be set to false if
-        /// there was a problem doing the evaluation.
-        /// </summary>
-        /// <param name="n">Number of problem variables</param>
-        /// <param name="x">Problem variables</param>
-        /// <param name="new_x">true if problem variables are new for this call, false otherwise</param>
-        /// <param name="grad_f">Objective function gradient</param>
-        /// <param name="user_data">Optional pointer to user defined data</param>
-        /// <returns>true if evaluation succeeded, false otherwise</returns>
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
-        public delegate IpoptBoolType Eval_Grad_F_CB(
-        [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-        [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] grad_f,
-        IntPtr user_data);
-
-        /// <summary>
-        /// Delegate defining the callback function for evaluating the value of
-        /// the constraint functions.  Return value should be set to false if
-        /// there was a problem doing the evaluation.
-        /// </summary>
-        /// <param name="n">Number of problem variables</param>
-        /// <param name="x">Problem variables</param>
-        /// <param name="new_x">true if problem variables are new for this call, false otherwise</param>
-        /// <param name="m">Number of constraint functions</param>
-        /// <param name="g">Calculated values of the constraint functions</param>
-        /// <param name="user_data">Optional pointer to user defined data</param>
-        /// <returns>true if evaluation succeeded, false otherwise</returns>
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
-        public delegate IpoptBoolType Eval_G_CB(
-        [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-        [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.I4)] int m,
-        [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] double[] g, IntPtr user_data);
-
-        /// <summary>
-        /// Delegate defining the callback function for evaluating the Jacobian of
-        /// the constraint functions.  Return value should be set to false if
-        /// there was a problem doing the evaluation.
-        /// </summary>
-        /// <param name="n">Number of problem variables</param>
-        /// <param name="x">Problem variables</param>
-        /// <param name="new_x">true if problem variables are new for this call, false otherwise</param>
-        /// <param name="m">Number of constraint functions</param>
-        /// <param name="nele_jac">Number of non-zero elements in the Jacobian</param>
-        /// <param name="iRow">Row indices of the non-zero Jacobian elements, defined here if values is null</param>
-        /// <param name="jCol">Column indices of the non-zero Jacobian elements, defined here if values is null</param>
-        /// <param name="values">Values of the non-zero Jacobian elements</param>
-        /// <param name="user_data">Optional pointer to user defined data</param>
-        /// <returns>true if evaluation succeeded, false otherwise</returns>
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
-        public delegate IpoptBoolType Eval_Jac_G_CB(
-        [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-        [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.I4)] int m, 
-        [MarshalAs(UnmanagedType.I4)] int nele_jac,
-        [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] iRow,
-        [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] jCol,
-        [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] values, IntPtr user_data);
-
-        /// <summary>
-        /// Delegate defining the callback function for evaluating the Hessian of
-        /// the Lagrangian function.  Return value should be set to false if
-        /// there was a problem doing the evaluation.
-        /// </summary>
-        /// <param name="n">Number of problem variables</param>
-        /// <param name="x">Problem variables</param>
-        /// <param name="new_x">true if problem variables are new for this call, false otherwise</param>
-        /// <param name="obj_factor">Multiplier for the objective function in the Lagrangian</param>
-        /// <param name="m">Number of constraint functions</param>
-        /// <param name="lambda">Multipliers for the constraint functions in the Lagrangian</param>
-        /// <param name="new_lambda">true if lambda values are new for this call, false otherwise</param>
-        /// <param name="nele_hess">Number of non-zero elements in the Hessian</param>
-        /// <param name="iRow">Row indices of the non-zero Hessian elements, defined here if values is null</param>
-        /// <param name="jCol">Column indices of the non-zero Hessian elements, defined here if values is null</param>
-        /// <param name="values">Values of the non-zero Hessian elements</param>
-        /// <param name="user_data">Optional pointer to user defined data</param>
-        /// <returns>true if evaluation succeeded, false otherwise</returns>
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
-        public delegate IpoptBoolType Eval_H_CB(
-        [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-        [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.R8)] double obj_factor, 
-        [MarshalAs(UnmanagedType.I4)] int m, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] lambda, 
-        [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_lambda, [MarshalAs(UnmanagedType.I4)] int nele_hess,
-        [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] iRow,
-        [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] jCol,
-        [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] double[] values, IntPtr user_data);
-
-        /// <summary>
-        /// Delegate defining the callback function for giving intermediate
-        /// execution control to the user.  If set, it is called once per
-        /// iteration, providing the user with some information on the state
-        /// of the optimization.  This can be used to print some
-        /// user-defined output.  It also gives the user a way to terminate
-        /// the optimization prematurely.  If this method returns false,
-        /// Ipopt will terminate the optimization.
-        /// </summary>
-        /// <param name="alg_mod">Current Ipopt algorithm mode</param>
-        /// <param name="iter_count">Current iteration count</param>
-        /// <param name="obj_value">The unscaled objective value at the current point</param>
-        /// <param name="inf_pr">The scaled primal infeasibility at the current point</param>
-        /// <param name="inf_du">The scaled dual infeasibility at the current point</param>
-        /// <param name="mu">The barrier parameter value at the current point</param>
-        /// <param name="d_norm">The infinity norm (max) of the primal step 
-        /// (for the original variables x and the internal slack variables s)</param>
-        /// <param name="regularization_size">Value of the regularization term for the Hessian of the Lagrangian 
-        /// in the augmented system</param>
-        /// <param name="alpha_du">The stepsize for the dual variables</param>
-        /// <param name="alpha_pr">The stepsize for the primal variables</param>
-        /// <param name="ls_trials">The number of backtracking line search steps</param>
-        /// <param name="user_data">Optional pointer to user defined data</param>
-        /// <returns>true if the optimization should proceeded after callback return, false if
-        /// the optimization should be terminated prematurely</returns>
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
-        public delegate IpoptBoolType Intermediate_CB(
-        [MarshalAs(UnmanagedType.I4)] IpoptAlgorithmMode alg_mod, [MarshalAs(UnmanagedType.I4)] int iter_count,
-        [MarshalAs(UnmanagedType.R8)] double obj_value, [MarshalAs(UnmanagedType.R8)] double inf_pr,
-        [MarshalAs(UnmanagedType.R8)] double inf_du, [MarshalAs(UnmanagedType.R8)] double mu,
-        [MarshalAs(UnmanagedType.R8)] double d_norm, [MarshalAs(UnmanagedType.R8)] double regularization_size,
-        [MarshalAs(UnmanagedType.R8)] double alpha_du, [MarshalAs(UnmanagedType.R8)] double alpha_pr,
-        [MarshalAs(UnmanagedType.I4)] int ls_trials, IntPtr user_data);
 
         #endregion
 

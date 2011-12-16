@@ -20,10 +20,6 @@ namespace hs071_sl
 
         private void StartOptButton_Click(object sender, RoutedEventArgs e)
         {
-            /* create the IpoptProblems */
-            var p = new HS071();
-            var r = new RosenbrockPostOffice();
-
             /* allocate space for the initial point and set the values */
             double[] x = { 1.0, 5.0, 5.0, 1.0 };
 
@@ -31,21 +27,18 @@ namespace hs071_sl
             {
                 var output = new StringBuilder();
 
+                IpoptReturnCode status;
                 double obj;
-                var problem = Ipopt.CreateIpoptProblem(p._n, p._x_L, p._x_U, p._m, p._g_L, p._g_U, p._nele_jac,
-                                                         p._nele_hess, IpoptIndexStyle.C,
-                                                         p.eval_f, p.eval_g, p.eval_grad_f, p.eval_jac_g, p.eval_h);
+                using (var hs071 = new HS071())
+                {
+                    // Set some options.  The following ones are only examples,
+                    // they might not be suitable for your problem.
+                    hs071.AddOption("tol", 1e-7);
+                    hs071.AddOption("mu_strategy", "adaptive");
 
-                // Set some options.  The following ones are only examples,
-                // they might not be suitable for your problem.
-                Ipopt.AddIpoptNumOption(problem, "tol", 1e-7);
-                Ipopt.AddIpoptStrOption(problem, "mu_strategy", "adaptive");
-
-                // Solve the problem.
-                var status = Ipopt.IpoptSolve(problem, x, null, out obj, null, null, null, IntPtr.Zero);
-
-                // Free problem resources.
-                Ipopt.FreeIpoptProblem(problem);
+                    // Solve the problem.
+                    status = hs071.SolveProblem(x, out obj, null, null, null, null);
+                }
 
                 output.AppendLine("HS071");
                 output.AppendLine("=====");
@@ -55,17 +48,18 @@ namespace hs071_sl
                 output.AppendLine();
 
                 // Also optimize Rosenbrock post office problem
-                problem = Ipopt.CreateIpoptProblem(r._n, r._x_L, r._x_U, r._m, r._g_L, r._g_U, r._nele_jac,
+                var r = new RosenbrockPostOffice();
+                var rosenbrock = IpoptAdapter.CreateIpoptProblem(r._n, r._x_L, r._x_U, r._m, r._g_L, r._g_U, r._nele_jac,
                                                          r._nele_hess, IpoptIndexStyle.C,
                                                          r.eval_f, r.eval_g, r.eval_grad_f, r.eval_jac_g, r.eval_h);
-                Ipopt.AddIpoptStrOption(problem, "hessian_approximation", "limited-memory");
-                Ipopt.AddIpoptIntOption(problem, "limited_memory_max_history", 5);
+                IpoptAdapter.AddIpoptStrOption(rosenbrock, "hessian_approximation", "limited-memory");
+                IpoptAdapter.AddIpoptIntOption(rosenbrock, "limited_memory_max_history", 5);
 #if INTERMEDIATE
-                Ipopt.SetIntermediateCallback(problem, r.intermediate);
+                IpoptAdapter.SetIntermediateCallback(problem, r.intermediate);
 #endif
 
                 x = new[] { 10.0, 10.0, 10.0 };
-                status = Ipopt.IpoptSolve(problem, x, null, out obj, null, null, null, IntPtr.Zero);
+                status = IpoptAdapter.IpoptSolve(rosenbrock, x, null, out obj, null, null, null, IntPtr.Zero);
 
                 output.AppendLine("Rosenbrock Post Office");
                 output.AppendLine("======================");

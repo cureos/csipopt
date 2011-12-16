@@ -8,42 +8,32 @@ using System.Runtime.InteropServices;
 
 namespace Cureos.Numerics
 {
-    public class HS071
+    public class HS071 : IpoptProblem
     {
-        public int _n;
-        public int _m;
-        public int _nele_jac;
-        public int _nele_hess;
-        public double[] _x_L;
-        public double[] _x_U;
-        public double[] _g_L;
-        public double[] _g_U;
-
-        public HS071()
+        public HS071() 
+            : base(
+            4,  // set the number of variables and allocate space for the bounds
+            new[] { 1.0, 1.0, 1.0, 1.0 },   // set the values for the variable bounds
+            new[] { 5.0, 5.0, 5.0, 5.0 },
+            2,  // set the number of constraints and allocate space for the bounds
+            new[] { 25.0, 40.0 },   // set the values of the constraint bounds
+            new[] { PositiveInfinity, 40.0 },
+            8,  // Number of nonzeros in the Jacobian of the constraints
+            10, // Number of nonzeros in the Hessian of the Lagrangian (lower or upper triangual part only)
+            eval_f,
+            eval_g,
+            eval_grad_f,
+            eval_jac_g,
+            eval_h
+#if INTERMEDIATE
+            , intermediate
+#endif
+            )
         {
-            /* set the number of variables and allocate space for the bounds */
-            /* set the values for the variable bounds */
-            _n = 4;
-            _x_L = new[] { 1.0, 1.0, 1.0, 1.0 };
-            _x_U = new[] { 5.0, 5.0, 5.0, 5.0 };
-
-            /* set the number of constraints and allocate space for the bounds */
-            _m = 2;
-
-            /* set the values of the constraint bounds */
-            _g_L = new[] { 25.0, 40.0 };
-            _g_U = new[] { Ipopt.PositiveInfinity, 40.0 };
-
-            /* Number of nonzeros in the Jacobian of the constraints */
-            _nele_jac = 8;
-
-            /* Number of nonzeros in the Hessian of the Lagrangian (lower or
-               upper triangual part only) */
-            _nele_hess = 10;
         }
 
         [AllowReversePInvokeCalls]
-        public IpoptBoolType eval_f(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr user_data)
+        public static IpoptBoolType eval_f(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr user_data)
         {
             obj_value = x[0] * x[3] * (x[0] + x[1] + x[2]) + x[2];
 
@@ -51,7 +41,7 @@ namespace Cureos.Numerics
         }
 
         [AllowReversePInvokeCalls]
-        public IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr user_data)
+        public static IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr user_data)
         {
             grad_f[0] = x[0] * x[3] + x[3] * (x[0] + x[1] + x[2]);
             grad_f[1] = x[0] * x[3];
@@ -62,7 +52,7 @@ namespace Cureos.Numerics
         }
 
         [AllowReversePInvokeCalls]
-        public IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr user_data)
+        public static IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr user_data)
         {
             g[0] = x[0] * x[1] * x[2] * x[3];
             g[1] = x[0] * x[0] + x[1] * x[1] + x[2] * x[2] + x[3] * x[3];
@@ -71,7 +61,7 @@ namespace Cureos.Numerics
         }
 
         [AllowReversePInvokeCalls]
-        public IpoptBoolType eval_jac_g(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac, 
+        public static IpoptBoolType eval_jac_g(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac, 
             int[] iRow, int[] jCol, double[] values, IntPtr user_data)
         {
             if (values == null)
@@ -115,7 +105,7 @@ namespace Cureos.Numerics
         }
 
         [AllowReversePInvokeCalls]
-        public IpoptBoolType eval_h(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda, 
+        public static IpoptBoolType eval_h(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda, 
             IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
         {
             if (values == null)
@@ -182,7 +172,7 @@ namespace Cureos.Numerics
 
 #if INTERMEDIATE
         [AllowReversePInvokeCalls]
-        public IpoptBoolType intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
+        public static IpoptBoolType intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
             double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
         {
             Console.WriteLine("Intermediate callback method at iteration {0} in {1} with d_norm {2}",

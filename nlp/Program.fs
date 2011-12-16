@@ -13,7 +13,7 @@ let x_U = [| 5.0; 5.0; 5.0; 5.0 |]
 // Set the number of constraints and set the values of the constraint bounds
 let m = 2
 let g_L = [| 25.0; 40.0 |]
-let g_U = [| Ipopt.PositiveInfinity; 40.0 |]
+let g_U = [| IpoptProblem.PositiveInfinity; 40.0 |]
 
 // Number of nonzeros in the Jacobian of the constraints
 let nele_jac = 8
@@ -121,7 +121,7 @@ let x = [| 1.0; 5.0; 5.0; 1.0 |]
 let mutable obj = 0.0
 
 // Initialize the optimization problem
-let problem = new Ipopt(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, eval_f, eval_g, eval_grad_f, eval_jac_g, eval_h)
+let problem = new IpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, eval_f, eval_g, eval_grad_f, eval_jac_g, eval_h)
 
 // Set some options.  Note the following ones are only examples, they might not be suitable for your problem.
 problem.AddOption("tol", 1.0e-7) |> ignore

@@ -112,7 +112,7 @@ namespace Cureos.Numerics
 
     #endregion
 
-    public sealed partial class Ipopt : IDisposable
+    public class IpoptProblem : IDisposable
     {
         #region INTERNAL CALLBACK FUNCTION CLASSES
 
@@ -225,6 +225,18 @@ namespace Cureos.Numerics
 
         #region FIELDS
 
+        /// <summary>
+        /// Value to indicate that a variable or constraint function has no upper bound 
+        /// (provided that IPOPT option "nlp_upper_bound_inf" is less than 2e19)
+        /// </summary>
+        public const double PositiveInfinity = 2.0e19;
+
+        /// <summary>
+        /// Value to indicate that a variable or constraint function has no lower bound 
+        /// (provided that IPOPT option "nlp_lower_bound_inf" is greater than -2e19)
+        /// </summary>
+        public const double NegativeInfinity = -2.0e19;
+
         private IntPtr m_problem;
         private bool m_disposed;
 
@@ -270,7 +282,7 @@ namespace Cureos.Numerics
         /// <param name="eval_grad_f">Callback function for evaluating gradient of objective function</param>
         /// <param name="eval_jac_g">Callback function for evaluating Jacobian of constraint functions</param>
         /// <param name="eval_h">Callback function for evaluating Hessian of Lagrangian function</param>
-        public Ipopt(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, int nele_jac, int nele_hess,
+        public IpoptProblem(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, int nele_jac, int nele_hess,
             EvaluateObjectiveDelegate eval_f, EvaluateConstraintsDelegate eval_g, EvaluateObjectiveGradientDelegate eval_grad_f,
             EvaluateJacobianDelegate eval_jac_g, EvaluateHessianDelegate eval_h)
         {
@@ -281,7 +293,61 @@ namespace Cureos.Numerics
             m_eval_h = new HessianEvaluator(eval_h).Evaluate;
             m_intermediate = null;
 
-            m_problem = CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, IpoptIndexStyle.C,
+            m_problem = IpoptAdapter.CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, IpoptIndexStyle.C,
+                                           m_eval_f, m_eval_g, m_eval_grad_f, m_eval_jac_g, m_eval_h);
+
+            if (m_problem == IntPtr.Zero)
+            {
+                throw new ArgumentException("Failed to initialize IPOPT problem");
+            }
+
+            m_disposed = false;
+        }
+
+        /// <summary>
+        /// Constructor for creating a new Ipopt Problem object.  This function
+        /// returns an object that can be passed to the IpoptSolve call.  It
+        /// contains the basic definition of the optimization problem, such
+        /// as number of variables and constraints, bounds on variables and
+        /// constraints, information about the derivatives, and the callback
+        /// function for the computation of the optimization problem
+        /// functions and derivatives.  During this call, the options file
+        /// PARAMS.DAT is read as well.
+        /// </summary>
+        /// <param name="n">Number of optimization variables</param>
+        /// <param name="x_L">Lower bounds on variables. This array of size n is copied internally, so that the
+        /// caller can change the incoming data after return without that IpoptProblem is modified.  Any value 
+        /// less or equal than the number specified by option 'nlp_lower_bound_inf' is interpreted to be minus infinity.</param>
+        /// <param name="x_U">Upper bounds on variables. This array of size n is copied internally, so that the
+        /// caller can change the incoming data after return without that IpoptProblem is modified.  Any value 
+        /// greater or equal than the number specified by option 'nlp_upper_bound_inf' is interpreted to be plus infinity.</param>
+        /// <param name="m">Number of constraints.</param>
+        /// <param name="g_L">Lower bounds on constraints. This array of size m is copied internally, so that the
+        /// caller can change the incoming data after return without that IpoptProblem is modified.  Any value 
+        /// less or equal than the number specified by option 'nlp_lower_bound_inf' is interpreted to be minus infinity.</param>
+        /// <param name="g_U">Upper bounds on constraints. This array of size m is copied internally, so that the
+        /// caller can change the incoming data after return without that IpoptProblem is modified.  Any value 
+        /// greater or equal than the number specified by option 'nlp_upper_bound_inf' is interpreted to be plus infinity.</param>
+        /// <param name="nele_jac">Number of non-zero elements in constraint Jacobian.</param>
+        /// <param name="nele_hess">Number of non-zero elements in Hessian of Lagrangian.</param>
+        /// <param name="eval_f">Callback function for evaluating objective function</param>
+        /// <param name="eval_g">Callback function for evaluating constraint functions</param>
+        /// <param name="eval_grad_f">Callback function for evaluating gradient of objective function</param>
+        /// <param name="eval_jac_g">Callback function for evaluating Jacobian of constraint functions</param>
+        /// <param name="eval_h">Callback function for evaluating Hessian of Lagrangian function</param>
+        /// <param name="intermediate">Intermediate callback function</param>
+        public IpoptProblem(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, int nele_jac, int nele_hess,
+            Eval_F_CB eval_f, Eval_G_CB eval_g, Eval_Grad_F_CB eval_grad_f, Eval_Jac_G_CB eval_jac_g, Eval_H_CB eval_h,
+            Intermediate_CB intermediate = null)
+        {
+            m_eval_f = eval_f;
+            m_eval_g = eval_g;
+            m_eval_grad_f = eval_grad_f;
+            m_eval_jac_g = eval_jac_g;
+            m_eval_h = eval_h;
+            m_intermediate = intermediate;
+
+            m_problem = IpoptAdapter.CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, IpoptIndexStyle.C,
                                            m_eval_f, m_eval_g, m_eval_grad_f, m_eval_jac_g, m_eval_h);
 
             if (m_problem == IntPtr.Zero)
@@ -295,7 +361,7 @@ namespace Cureos.Numerics
         /// <summary>
         /// Destructor for IPOPT problem
         /// </summary>
-        ~Ipopt()
+        ~IpoptProblem()
         {
             Dispose(false);
         }
@@ -321,7 +387,7 @@ namespace Cureos.Numerics
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
         public bool AddOption(string keyword, string val)
         {
-            return AddIpoptStrOption(m_problem, keyword, val) == IpoptBoolType.True;
+            return IpoptAdapter.AddIpoptStrOption(m_problem, keyword, val) == IpoptBoolType.True;
         }
 
         /// <summary>
@@ -332,7 +398,7 @@ namespace Cureos.Numerics
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
         public bool AddOption(string keyword, double val)
         {
-            return AddIpoptNumOption(m_problem, keyword, val) == IpoptBoolType.True;
+            return IpoptAdapter.AddIpoptNumOption(m_problem, keyword, val) == IpoptBoolType.True;
         }
 
         /// <summary>
@@ -343,7 +409,7 @@ namespace Cureos.Numerics
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
         public bool AddOption(string keyword, int val)
         {
-            return AddIpoptIntOption(m_problem, keyword, val) == IpoptBoolType.True;
+            return IpoptAdapter.AddIpoptIntOption(m_problem, keyword, val) == IpoptBoolType.True;
         }
 
 #if !SILVERLIGHT
@@ -355,7 +421,7 @@ namespace Cureos.Numerics
         /// <returns>False, if there was a problem opening the file.</returns>
         public bool OpenOutputFile(string file_name, int print_level)
         {
-            return OpenIpoptOutputFile(m_problem, file_name, print_level) == IpoptBoolType.True;
+            return IpoptAdapter.OpenIpoptOutputFile(m_problem, file_name, print_level) == IpoptBoolType.True;
         }
 #endif
 
@@ -371,7 +437,7 @@ namespace Cureos.Numerics
         /// <returns>true if scaling succeeded, false otherwise</returns>
         public bool SetScaling(double obj_scaling, double[] x_scaling, double[] g_scaling)
         {
-            return SetIpoptProblemScaling(m_problem, obj_scaling, x_scaling, g_scaling) == IpoptBoolType.True;
+            return IpoptAdapter.SetIpoptProblemScaling(m_problem, obj_scaling, x_scaling, g_scaling) == IpoptBoolType.True;
         }
 
         /// <summary>
@@ -390,7 +456,7 @@ namespace Cureos.Numerics
         public bool SetIntermediateCallback(IntermediateDelegate intermediate)
         {
             m_intermediate = new IntermediateReporter(intermediate).Report;
-            return SetIntermediateCallback(m_problem, m_intermediate) == IpoptBoolType.True;
+            return IpoptAdapter.SetIntermediateCallback(m_problem, m_intermediate) == IpoptBoolType.True;
         }
 
         /// <summary>
@@ -406,18 +472,28 @@ namespace Cureos.Numerics
         /// <returns>Outcome of the optimization procedure (e.g., success, failure etc).</returns>
         public IpoptReturnCode SolveProblem(double[] x, out double obj_val, double[] g, double[] mult_g, double[] mult_x_L, double[] mult_x_U)
         {
-            return IpoptSolve(m_problem, x, g, out obj_val, mult_g, mult_x_L, mult_x_U, IntPtr.Zero);
+            return IpoptAdapter.IpoptSolve(m_problem, x, g, out obj_val, mult_g, mult_x_L, mult_x_U, IntPtr.Zero);
         }
 
         #endregion
 
-        #region PRIVATE METHODS
+        #region METHODS
 
-        private void Dispose(bool disposing)
+        /// <summary>
+        /// Dispose(bool disposing) executes in two distinct scenarios.
+        /// If disposing equals true, the method has been called directly
+        /// or indirectly by a user's code. Managed and unmanaged resources
+        /// can be disposed.
+        /// If disposing equals false, the method has been called by the
+        /// runtime from inside the finalizer and you should not reference
+        /// other objects. Only unmanaged resources can be disposed.
+        /// </summary>
+        /// <param name="disposing">true if Dispose method is explicitly called, false otherwise.</param>
+        protected virtual void Dispose(bool disposing)
         {
             if (!m_disposed)
             {
-                FreeIpoptProblem(m_problem);
+                IpoptAdapter.FreeIpoptProblem(m_problem);
 
                 if (disposing)
                 {

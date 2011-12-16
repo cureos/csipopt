@@ -20,7 +20,7 @@ namespace hs071_cs
 
             IpoptReturnCode status;
 
-            using (Ipopt problem = new Ipopt(p._n, p._x_L, p._x_U, p._m, p._g_L, p._g_U, p._nele_jac, p._nele_hess, 
+            using (var problem = new IpoptProblem(p._n, p._x_L, p._x_U, p._m, p._g_L, p._g_U, p._nele_jac, p._nele_hess, 
                 p.eval_f, p.eval_g, p.eval_grad_f, p.eval_jac_g, p.eval_h))
             {
                 /* Set some options.  The following ones are only examples,
@@ -70,7 +70,7 @@ namespace hs071_cs
 
             /* set the values of the constraint bounds */
             _g_L = new double[] { 25.0, 40.0 };
-            _g_U = new double[] { Ipopt.PositiveInfinity, 40.0 };
+            _g_U = new double[] { IpoptProblem.PositiveInfinity, 40.0 };
 
             /* Number of nonzeros in the Jacobian of the constraints */
             _nele_jac = 8;

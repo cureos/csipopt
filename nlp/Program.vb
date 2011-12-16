@@ -22,7 +22,7 @@ Namespace hs071_cs
             Dim obj As Double
             Dim status As IpoptReturnCode
 
-            Using problem As New Ipopt(p.n, p.x_L, p.x_U, p.m, p.g_L, p.g_U, _
+            Using problem As New IpoptProblem(p.n, p.x_L, p.x_U, p.m, p.g_L, p.g_U, _
              p.nele_jac, p.nele_hess, AddressOf p.eval_f, AddressOf p.eval_g, _
              AddressOf p.eval_grad_f, AddressOf p.eval_jac_g, AddressOf p.eval_h)
                 ' Set some options.  Note the following ones are only examples,
@@ -64,7 +64,7 @@ Namespace hs071_cs
             ' set the values of the constraint bounds 
             m = 2
             g_L = {25, 40}
-            g_U = {Ipopt.PositiveInfinity, 40}
+            g_U = {IpoptProblem.PositiveInfinity, 40}
 
             ' Number of nonzeros in the Jacobian of the constraints 
             nele_jac = 8
