@@ -294,12 +294,7 @@ namespace Cureos.Numerics
             m_intermediate = null;
 
             m_problem = IpoptAdapter.CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, IpoptIndexStyle.C,
-                                           m_eval_f, m_eval_g, m_eval_grad_f, m_eval_jac_g, m_eval_h);
-
-            if (m_problem == IntPtr.Zero)
-            {
-                throw new ArgumentException("Failed to initialize IPOPT problem");
-            }
+                m_eval_f, m_eval_g, m_eval_grad_f, m_eval_jac_g, m_eval_h);
 
             m_disposed = false;
         }
@@ -335,10 +330,24 @@ namespace Cureos.Numerics
         /// <param name="eval_grad_f">Callback function for evaluating gradient of objective function</param>
         /// <param name="eval_jac_g">Callback function for evaluating Jacobian of constraint functions</param>
         /// <param name="eval_h">Callback function for evaluating Hessian of Lagrangian function</param>
-        /// <param name="intermediate">Intermediate callback function</param>
         public IpoptProblem(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, int nele_jac, int nele_hess,
-            Eval_F_CB eval_f, Eval_G_CB eval_g, Eval_Grad_F_CB eval_grad_f, Eval_Jac_G_CB eval_jac_g, Eval_H_CB eval_h,
-            Intermediate_CB intermediate = null)
+            Eval_F_CB eval_f, Eval_G_CB eval_g, Eval_Grad_F_CB eval_grad_f, Eval_Jac_G_CB eval_jac_g, Eval_H_CB eval_h)
+        {
+            m_eval_f = eval_f;
+            m_eval_g = eval_g;
+            m_eval_grad_f = eval_grad_f;
+            m_eval_jac_g = eval_jac_g;
+            m_eval_h = eval_h;
+            m_intermediate = null;
+
+            m_problem = IpoptAdapter.CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, IpoptIndexStyle.C,
+                m_eval_f, m_eval_g, m_eval_grad_f, m_eval_jac_g, m_eval_h);
+            
+            m_disposed = false;
+        }
+
+        protected IpoptProblem(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, int nele_jac, int nele_hess,
+            bool useIntermediateCallback = false)
         {
             m_eval_f = eval_f;
             m_eval_g = eval_g;
@@ -350,10 +359,8 @@ namespace Cureos.Numerics
             m_problem = IpoptAdapter.CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, IpoptIndexStyle.C,
                                            m_eval_f, m_eval_g, m_eval_grad_f, m_eval_jac_g, m_eval_h);
 
-            if (m_problem == IntPtr.Zero)
-            {
-                throw new ArgumentException("Failed to initialize IPOPT problem");
-            }
+            if (IsInitialized && useIntermediateCallback)
+                IpoptAdapter.SetIntermediateCallback(m_problem, m_intermediate);
 
             m_disposed = false;
         }
@@ -368,7 +375,16 @@ namespace Cureos.Numerics
 
         #endregion
 
-        #region PUBLIC METHODS
+        #region PROPERTIES
+
+        public bool IsInitialized
+        {
+            get { return m_problem != IntPtr.Zero; }
+        }
+
+        #endregion
+
+        #region METHODS
 
         /// <summary>
         /// Implement the IDisposable interface to release the Ipopt DLL resources held by this class
@@ -385,9 +401,9 @@ namespace Cureos.Numerics
         /// <param name="keyword">Name of option</param>
         /// <param name="val">String value of option</param>
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
-        public bool AddOption(string keyword, string val)
+        public virtual bool AddOption(string keyword, string val)
         {
-            return IpoptAdapter.AddIpoptStrOption(m_problem, keyword, val) == IpoptBoolType.True;
+            return IsInitialized && IpoptAdapter.AddIpoptStrOption(m_problem, keyword, val) == IpoptBoolType.True;
         }
 
         /// <summary>
@@ -396,9 +412,9 @@ namespace Cureos.Numerics
         /// <param name="keyword">Name of option</param>
         /// <param name="val">Floating point value of option</param>
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
-        public bool AddOption(string keyword, double val)
+        public virtual bool AddOption(string keyword, double val)
         {
-            return IpoptAdapter.AddIpoptNumOption(m_problem, keyword, val) == IpoptBoolType.True;
+            return IsInitialized && IpoptAdapter.AddIpoptNumOption(m_problem, keyword, val) == IpoptBoolType.True;
         }
 
         /// <summary>
@@ -407,9 +423,9 @@ namespace Cureos.Numerics
         /// <param name="keyword">Name of option</param>
         /// <param name="val">Integer value of option</param>
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
-        public bool AddOption(string keyword, int val)
+        public virtual bool AddOption(string keyword, int val)
         {
-            return IpoptAdapter.AddIpoptIntOption(m_problem, keyword, val) == IpoptBoolType.True;
+            return IsInitialized && IpoptAdapter.AddIpoptIntOption(m_problem, keyword, val) == IpoptBoolType.True;
         }
 
 #if !SILVERLIGHT
@@ -419,9 +435,9 @@ namespace Cureos.Numerics
         /// <param name="file_name">Name of output file</param>
         /// <param name="print_level">Level of printed information</param>
         /// <returns>False, if there was a problem opening the file.</returns>
-        public bool OpenOutputFile(string file_name, int print_level)
+        public virtual bool OpenOutputFile(string file_name, int print_level)
         {
-            return IpoptAdapter.OpenIpoptOutputFile(m_problem, file_name, print_level) == IpoptBoolType.True;
+            return IsInitialized && IpoptAdapter.OpenIpoptOutputFile(m_problem, file_name, print_level) == IpoptBoolType.True;
         }
 #endif
 
@@ -435,9 +451,11 @@ namespace Cureos.Numerics
         /// <param name="x_scaling">Scaling of the problem variables</param>
         /// <param name="g_scaling">Scaling of the constraint functions</param>
         /// <returns>true if scaling succeeded, false otherwise</returns>
-        public bool SetScaling(double obj_scaling, double[] x_scaling, double[] g_scaling)
+        public virtual bool SetScaling(double obj_scaling, double[] x_scaling, double[] g_scaling)
         {
-            return IpoptAdapter.SetIpoptProblemScaling(m_problem, obj_scaling, x_scaling, g_scaling) == IpoptBoolType.True;
+            return IsInitialized &&
+                   IpoptAdapter.SetIpoptProblemScaling(m_problem, obj_scaling, x_scaling, g_scaling) ==
+                   IpoptBoolType.True;
         }
 
         /// <summary>
@@ -453,8 +471,10 @@ namespace Cureos.Numerics
         /// </summary>
         /// <param name="intermediate">Intermediate callback function</param>
         /// <returns>true if the callback function could be set successfully, false otherwise</returns>
-        public bool SetIntermediateCallback(IntermediateDelegate intermediate)
+        public virtual bool SetIntermediateCallback(IntermediateDelegate intermediate)
         {
+            if (!IsInitialized) return false;
+
             m_intermediate = new IntermediateReporter(intermediate).Report;
             return IpoptAdapter.SetIntermediateCallback(m_problem, m_intermediate) == IpoptBoolType.True;
         }
@@ -470,14 +490,15 @@ namespace Cureos.Numerics
         /// <param name="mult_x_L">Final multipliers for lower variable bounds (output only - ignored if null on input)</param>
         /// <param name="mult_x_U">Final multipliers for upper variable bounds (output only - ignored if null on input)</param>
         /// <returns>Outcome of the optimization procedure (e.g., success, failure etc).</returns>
-        public IpoptReturnCode SolveProblem(double[] x, out double obj_val, double[] g, double[] mult_g, double[] mult_x_L, double[] mult_x_U)
+        public virtual IpoptReturnCode SolveProblem(double[] x, out double obj_val, double[] g, double[] mult_g, double[] mult_x_L, double[] mult_x_U)
         {
+            if (!IsInitialized)
+            {
+                obj_val = PositiveInfinity;
+                return IpoptReturnCode.Problem_Not_Initialized;
+            }
             return IpoptAdapter.IpoptSolve(m_problem, x, g, out obj_val, mult_g, mult_x_L, mult_x_U, IntPtr.Zero);
         }
-
-        #endregion
-
-        #region METHODS
 
         /// <summary>
         /// Dispose(bool disposing) executes in two distinct scenarios.
@@ -493,7 +514,8 @@ namespace Cureos.Numerics
         {
             if (!m_disposed)
             {
-                IpoptAdapter.FreeIpoptProblem(m_problem);
+                if (m_problem != IntPtr.Zero)
+                    IpoptAdapter.FreeIpoptProblem(m_problem);
 
                 if (disposing)
                 {
@@ -502,6 +524,50 @@ namespace Cureos.Numerics
 
                 m_disposed = true;
             }
+        }
+
+        #endregion
+
+        #region DEFAULT DELEGATE IMPLEMENTATIONS
+
+        [AllowReversePInvokeCalls]
+        protected virtual IpoptBoolType eval_f(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr user_data)
+        {
+            obj_value = PositiveInfinity;
+            return IpoptBoolType.False;
+        }
+
+        [AllowReversePInvokeCalls]
+        protected virtual IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr user_data)
+        {
+            return IpoptBoolType.False;
+        }
+
+        [AllowReversePInvokeCalls]
+        protected virtual IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr user_data)
+        {
+            return IpoptBoolType.False;
+        }
+
+        [AllowReversePInvokeCalls]
+        protected virtual IpoptBoolType eval_jac_g(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac,
+            int[] iRow, int[] jCol, double[] values, IntPtr user_data)
+        {
+            return IpoptBoolType.False;
+        }
+
+        [AllowReversePInvokeCalls]
+        protected virtual IpoptBoolType eval_h(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda,
+            IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
+        {
+            return IpoptBoolType.True;
+        }
+
+        [AllowReversePInvokeCalls]
+        protected virtual IpoptBoolType intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
+            double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
+        {
+            return IpoptBoolType.False;
         }
 
         #endregion

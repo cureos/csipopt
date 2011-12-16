@@ -30,6 +30,8 @@ namespace Cureos.Numerics
         Unrecoverable_Exception = -100,
         NonIpopt_Exception_Thrown = -101,
         Insufficient_Memory = -102,
-        Internal_Error = -199
+        Internal_Error = -199,
+
+        Problem_Not_Initialized = -900
     }
 }
