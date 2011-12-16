@@ -55,22 +55,22 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\IpoptAdapter.cs">
+    <Compile Include="..\..\src\IpoptAdapter.cs">
       <Link>IpoptAdapter.cs</Link>
     </Compile>
-    <Compile Include="..\..\IpoptAlgorithmMode.cs">
+    <Compile Include="..\..\src\IpoptAlgorithmMode.cs">
       <Link>IpoptAlgorithmMode.cs</Link>
     </Compile>
-    <Compile Include="..\..\IpoptBoolType.cs">
+    <Compile Include="..\..\src\IpoptBoolType.cs">
       <Link>IpoptBoolType.cs</Link>
     </Compile>
-    <Compile Include="..\..\IpoptIndexStyle.cs">
+    <Compile Include="..\..\src\IpoptIndexStyle.cs">
       <Link>IpoptIndexStyle.cs</Link>
     </Compile>
-    <Compile Include="..\..\IpoptInterop.cs">
-      <Link>IpoptInterop.cs</Link>
+    <Compile Include="..\..\src\IpoptProblem.cs">
+      <Link>IpoptProblem.cs</Link>
     </Compile>
-    <Compile Include="..\..\IpoptReturnCode.cs">
+    <Compile Include="..\..\src\IpoptReturnCode.cs">
       <Link>IpoptReturnCode.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />

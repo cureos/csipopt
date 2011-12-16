@@ -17,4 +17,7 @@ Cureos.Numerics/SL.Cureos.Numerics/obj/
 /hs071_*.exe
 Ipopt*.dll
 /Cureos.Numerics.dll
-/hs071.txt
+/build/*.txt
+/build/*.dll
+/build/*.exe
+*.txt
