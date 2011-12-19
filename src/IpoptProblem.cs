@@ -240,19 +240,20 @@ namespace Cureos.Numerics
         private IntPtr m_problem;
         private bool m_disposed;
 
-        private readonly Eval_F_CB m_eval_f;
-        private readonly Eval_G_CB m_eval_g; 
-        private readonly Eval_Grad_F_CB m_eval_grad_f;
-        private readonly Eval_Jac_G_CB m_eval_jac_g;
-        private readonly Eval_H_CB m_eval_h;
-        private Intermediate_CB m_intermediate;
+        private readonly Eval_F_CB m_eval_f_cb;
+        private readonly Eval_G_CB m_eval_g_cb; 
+        private readonly Eval_Grad_F_CB m_eval_grad_f_cb;
+        private readonly Eval_Jac_G_CB m_eval_jac_g_cb;
+        private readonly Eval_H_CB m_eval_h_cb;
+        private Intermediate_CB m_intermediate_cb;
 
         #endregion
 
         #region CONSTRUCTORS
 
         /// <summary>
-        /// Constructor for creating a new Ipopt Problem object.  This function
+        /// Constructor for creating a new Ipopt Problem object using managed 
+        /// function delegates.  This function
         /// returns an object that can be passed to the IpoptSolve call.  It
         /// contains the basic definition of the optimization problem, such
         /// as number of variables and constraints, bounds on variables and
@@ -277,30 +278,31 @@ namespace Cureos.Numerics
         /// greater or equal than the number specified by option 'nlp_upper_bound_inf' is interpreted to be plus infinity.</param>
         /// <param name="nele_jac">Number of non-zero elements in constraint Jacobian.</param>
         /// <param name="nele_hess">Number of non-zero elements in Hessian of Lagrangian.</param>
-        /// <param name="eval_f">Callback function for evaluating objective function</param>
-        /// <param name="eval_g">Callback function for evaluating constraint functions</param>
-        /// <param name="eval_grad_f">Callback function for evaluating gradient of objective function</param>
-        /// <param name="eval_jac_g">Callback function for evaluating Jacobian of constraint functions</param>
-        /// <param name="eval_h">Callback function for evaluating Hessian of Lagrangian function</param>
+        /// <param name="eval_f_cb">Managed callback function for evaluating objective function</param>
+        /// <param name="eval_g_cb">Managed callback function for evaluating constraint functions</param>
+        /// <param name="eval_grad_f_cb">Managed callback function for evaluating gradient of objective function</param>
+        /// <param name="eval_jac_g_cb">Managed callback function for evaluating Jacobian of constraint functions</param>
+        /// <param name="eval_h_cb">Managed callback function for evaluating Hessian of Lagrangian function</param>
         public IpoptProblem(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, int nele_jac, int nele_hess,
-            EvaluateObjectiveDelegate eval_f, EvaluateConstraintsDelegate eval_g, EvaluateObjectiveGradientDelegate eval_grad_f,
-            EvaluateJacobianDelegate eval_jac_g, EvaluateHessianDelegate eval_h)
+            EvaluateObjectiveDelegate eval_f_cb, EvaluateConstraintsDelegate eval_g_cb, EvaluateObjectiveGradientDelegate eval_grad_f_cb,
+            EvaluateJacobianDelegate eval_jac_g_cb, EvaluateHessianDelegate eval_h_cb)
         {
-            m_eval_f = new ObjectiveEvaluator(eval_f).Evaluate;
-            m_eval_g = new ConstraintsEvaluator(eval_g).Evaluate;
-            m_eval_grad_f = new ObjectiveGradientEvaluator(eval_grad_f).Evaluate;
-            m_eval_jac_g = new JacobianEvaluator(eval_jac_g).Evaluate;
-            m_eval_h = new HessianEvaluator(eval_h).Evaluate;
-            m_intermediate = null;
+            m_eval_f_cb = new ObjectiveEvaluator(eval_f_cb).Evaluate;
+            m_eval_g_cb = new ConstraintsEvaluator(eval_g_cb).Evaluate;
+            m_eval_grad_f_cb = new ObjectiveGradientEvaluator(eval_grad_f_cb).Evaluate;
+            m_eval_jac_g_cb = new JacobianEvaluator(eval_jac_g_cb).Evaluate;
+            m_eval_h_cb = new HessianEvaluator(eval_h_cb).Evaluate;
+            m_intermediate_cb = null;
 
             m_problem = IpoptAdapter.CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, IpoptIndexStyle.C,
-                m_eval_f, m_eval_g, m_eval_grad_f, m_eval_jac_g, m_eval_h);
+                m_eval_f_cb, m_eval_g_cb, m_eval_grad_f_cb, m_eval_jac_g_cb, m_eval_h_cb);
 
             m_disposed = false;
         }
 
         /// <summary>
-        /// Constructor for creating a new Ipopt Problem object.  This function
+        /// Constructor for creating a new Ipopt Problem object using native
+        /// function delegates. This function
         /// returns an object that can be passed to the IpoptSolve call.  It
         /// contains the basic definition of the optimization problem, such
         /// as number of variables and constraints, bounds on variables and
@@ -325,23 +327,23 @@ namespace Cureos.Numerics
         /// greater or equal than the number specified by option 'nlp_upper_bound_inf' is interpreted to be plus infinity.</param>
         /// <param name="nele_jac">Number of non-zero elements in constraint Jacobian.</param>
         /// <param name="nele_hess">Number of non-zero elements in Hessian of Lagrangian.</param>
-        /// <param name="eval_f">Callback function for evaluating objective function</param>
-        /// <param name="eval_g">Callback function for evaluating constraint functions</param>
-        /// <param name="eval_grad_f">Callback function for evaluating gradient of objective function</param>
-        /// <param name="eval_jac_g">Callback function for evaluating Jacobian of constraint functions</param>
-        /// <param name="eval_h">Callback function for evaluating Hessian of Lagrangian function</param>
+        /// <param name="eval_f_cb">Native callback function for evaluating objective function</param>
+        /// <param name="eval_g_cb">Native callback function for evaluating constraint functions</param>
+        /// <param name="eval_grad_f_cb">Native callback function for evaluating gradient of objective function</param>
+        /// <param name="eval_jac_g_cb">Native callback function for evaluating Jacobian of constraint functions</param>
+        /// <param name="eval_h_cb">Native callback function for evaluating Hessian of Lagrangian function</param>
         public IpoptProblem(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, int nele_jac, int nele_hess,
-            Eval_F_CB eval_f, Eval_G_CB eval_g, Eval_Grad_F_CB eval_grad_f, Eval_Jac_G_CB eval_jac_g, Eval_H_CB eval_h)
+            Eval_F_CB eval_f_cb, Eval_G_CB eval_g_cb, Eval_Grad_F_CB eval_grad_f_cb, Eval_Jac_G_CB eval_jac_g_cb, Eval_H_CB eval_h_cb)
         {
-            m_eval_f = eval_f;
-            m_eval_g = eval_g;
-            m_eval_grad_f = eval_grad_f;
-            m_eval_jac_g = eval_jac_g;
-            m_eval_h = eval_h;
-            m_intermediate = null;
+            m_eval_f_cb = eval_f_cb;
+            m_eval_g_cb = eval_g_cb;
+            m_eval_grad_f_cb = eval_grad_f_cb;
+            m_eval_jac_g_cb = eval_jac_g_cb;
+            m_eval_h_cb = eval_h_cb;
+            m_intermediate_cb = null;
 
             m_problem = IpoptAdapter.CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, IpoptIndexStyle.C,
-                m_eval_f, m_eval_g, m_eval_grad_f, m_eval_jac_g, m_eval_h);
+                m_eval_f_cb, m_eval_g_cb, m_eval_grad_f_cb, m_eval_jac_g_cb, m_eval_h_cb);
             
             m_disposed = false;
         }
@@ -349,18 +351,16 @@ namespace Cureos.Numerics
         protected IpoptProblem(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, int nele_jac, int nele_hess,
             bool useIntermediateCallback = false)
         {
-            m_eval_f = eval_f;
-            m_eval_g = eval_g;
-            m_eval_grad_f = eval_grad_f;
-            m_eval_jac_g = eval_jac_g;
-            m_eval_h = eval_h;
-            m_intermediate = intermediate;
+            m_eval_f_cb = eval_f;
+            m_eval_g_cb = eval_g;
+            m_eval_grad_f_cb = eval_grad_f;
+            m_eval_jac_g_cb = eval_jac_g;
+            m_eval_h_cb = eval_h;
+            m_intermediate_cb = null;
 
             m_problem = IpoptAdapter.CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, IpoptIndexStyle.C,
-                                           m_eval_f, m_eval_g, m_eval_grad_f, m_eval_jac_g, m_eval_h);
-
-            if (IsInitialized && useIntermediateCallback)
-                IpoptAdapter.SetIntermediateCallback(m_problem, m_intermediate);
+                                           m_eval_f_cb, m_eval_g_cb, m_eval_grad_f_cb, m_eval_jac_g_cb, m_eval_h_cb);
+            if (useIntermediateCallback) SetIntermediateCallback(intermediate);
 
             m_disposed = false;
         }
@@ -401,7 +401,7 @@ namespace Cureos.Numerics
         /// <param name="keyword">Name of option</param>
         /// <param name="val">String value of option</param>
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
-        public virtual bool AddOption(string keyword, string val)
+        public bool AddOption(string keyword, string val)
         {
             return IsInitialized && IpoptAdapter.AddIpoptStrOption(m_problem, keyword, val) == IpoptBoolType.True;
         }
@@ -412,7 +412,7 @@ namespace Cureos.Numerics
         /// <param name="keyword">Name of option</param>
         /// <param name="val">Floating point value of option</param>
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
-        public virtual bool AddOption(string keyword, double val)
+        public bool AddOption(string keyword, double val)
         {
             return IsInitialized && IpoptAdapter.AddIpoptNumOption(m_problem, keyword, val) == IpoptBoolType.True;
         }
@@ -423,19 +423,19 @@ namespace Cureos.Numerics
         /// <param name="keyword">Name of option</param>
         /// <param name="val">Integer value of option</param>
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
-        public virtual bool AddOption(string keyword, int val)
+        public bool AddOption(string keyword, int val)
         {
             return IsInitialized && IpoptAdapter.AddIpoptIntOption(m_problem, keyword, val) == IpoptBoolType.True;
         }
 
 #if !SILVERLIGHT
         /// <summary>
-        /// Method for opening an output file for a given name with given printlevel.
+        /// Method for opening an output file for a given name with given print level.
         /// </summary>
         /// <param name="file_name">Name of output file</param>
         /// <param name="print_level">Level of printed information</param>
         /// <returns>False, if there was a problem opening the file.</returns>
-        public virtual bool OpenOutputFile(string file_name, int print_level)
+        public bool OpenOutputFile(string file_name, int print_level)
         {
             return IsInitialized && IpoptAdapter.OpenIpoptOutputFile(m_problem, file_name, print_level) == IpoptBoolType.True;
         }
@@ -451,7 +451,7 @@ namespace Cureos.Numerics
         /// <param name="x_scaling">Scaling of the problem variables</param>
         /// <param name="g_scaling">Scaling of the constraint functions</param>
         /// <returns>true if scaling succeeded, false otherwise</returns>
-        public virtual bool SetScaling(double obj_scaling, double[] x_scaling, double[] g_scaling)
+        public bool SetScaling(double obj_scaling, double[] x_scaling, double[] g_scaling)
         {
             return IsInitialized &&
                    IpoptAdapter.SetIpoptProblemScaling(m_problem, obj_scaling, x_scaling, g_scaling) ==
@@ -469,14 +469,31 @@ namespace Cureos.Numerics
         /// Calling this set method to set the CB pointer to null disables
         /// the intermediate callback functionality.
         /// </summary>
-        /// <param name="intermediate">Intermediate callback function</param>
+        /// <param name="intermediate_cb">Managed intermediate callback function</param>
         /// <returns>true if the callback function could be set successfully, false otherwise</returns>
-        public virtual bool SetIntermediateCallback(IntermediateDelegate intermediate)
+        public bool SetIntermediateCallback(IntermediateDelegate intermediate_cb)
         {
-            if (!IsInitialized) return false;
+            return IsInitialized && IpoptAdapter.SetIntermediateCallback(
+                m_problem, m_intermediate_cb = new IntermediateReporter(intermediate_cb).Report) == IpoptBoolType.True;
+        }
 
-            m_intermediate = new IntermediateReporter(intermediate).Report;
-            return IpoptAdapter.SetIntermediateCallback(m_problem, m_intermediate) == IpoptBoolType.True;
+        /// <summary>
+        /// Setting a callback function for the "intermediate callback"
+        /// method in the optimizer.  This gives control back to the user once
+        /// per iteration.  If set, it provides the user with some
+        /// information on the state of the optimization.  This can be used
+        /// to print some user-defined output.  It also gives the user a way
+        /// to terminate the optimization prematurely.  If the callback
+        /// method returns false, Ipopt will terminate the optimization.
+        /// Calling this set method to set the CB pointer to null disables
+        /// the intermediate callback functionality.
+        /// </summary>
+        /// <param name="intermediate_cb">Native intermediate callback function</param>
+        /// <returns>true if the callback function could be set successfully, false otherwise</returns>
+        public bool SetIntermediateCallback(Intermediate_CB intermediate_cb)
+        {
+            return IsInitialized && 
+                IpoptAdapter.SetIntermediateCallback(m_problem, m_intermediate_cb = intermediate_cb) == IpoptBoolType.True;
         }
 
         /// <summary>
@@ -490,7 +507,7 @@ namespace Cureos.Numerics
         /// <param name="mult_x_L">Final multipliers for lower variable bounds (output only - ignored if null on input)</param>
         /// <param name="mult_x_U">Final multipliers for upper variable bounds (output only - ignored if null on input)</param>
         /// <returns>Outcome of the optimization procedure (e.g., success, failure etc).</returns>
-        public virtual IpoptReturnCode SolveProblem(double[] x, out double obj_val, double[] g, double[] mult_g, double[] mult_x_L, double[] mult_x_U)
+        public IpoptReturnCode SolveProblem(double[] x, out double obj_val, double[] g, double[] mult_g, double[] mult_x_L, double[] mult_x_U)
         {
             if (!IsInitialized)
             {
@@ -531,43 +548,42 @@ namespace Cureos.Numerics
         #region DEFAULT DELEGATE IMPLEMENTATIONS
 
         [AllowReversePInvokeCalls]
-        protected virtual IpoptBoolType eval_f(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr user_data)
+        public virtual IpoptBoolType eval_f(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr user_data)
         {
-            obj_value = PositiveInfinity;
-            return IpoptBoolType.False;
+            throw new NotSupportedException("Objective function evaluation must be implemented in subclass.");
         }
 
         [AllowReversePInvokeCalls]
-        protected virtual IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr user_data)
+        public virtual IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr user_data)
         {
-            return IpoptBoolType.False;
+            throw new NotSupportedException("Constraints evaluation must be implemented in subclass.");
         }
 
         [AllowReversePInvokeCalls]
-        protected virtual IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr user_data)
+        public virtual IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr user_data)
         {
-            return IpoptBoolType.False;
+            throw new NotSupportedException("Objective function gradient evaluation must be implemented in subclass.");
         }
 
         [AllowReversePInvokeCalls]
-        protected virtual IpoptBoolType eval_jac_g(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac,
+        public virtual IpoptBoolType eval_jac_g(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac,
             int[] iRow, int[] jCol, double[] values, IntPtr user_data)
         {
-            return IpoptBoolType.False;
+            throw new NotSupportedException("Jacobian evaluation must be implemented in subclass.");
         }
 
         [AllowReversePInvokeCalls]
-        protected virtual IpoptBoolType eval_h(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda,
+        public virtual IpoptBoolType eval_h(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda,
             IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
         {
             return IpoptBoolType.True;
         }
 
         [AllowReversePInvokeCalls]
-        protected virtual IpoptBoolType intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
+        public virtual IpoptBoolType intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
             double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
         {
-            return IpoptBoolType.False;
+            return IpoptBoolType.True;
         }
 
         #endregion
