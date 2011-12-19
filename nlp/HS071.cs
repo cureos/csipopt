@@ -21,6 +21,7 @@ namespace Cureos.Numerics
             8,  // Number of nonzeros in the Jacobian of the constraints
             10 // Number of nonzeros in the Hessian of the Lagrangian (lower or upper triangual part only)
 #if INTERMEDIATE
+            , false
             , true
 #endif
             )
@@ -36,21 +37,21 @@ namespace Cureos.Numerics
         }
 
         [AllowReversePInvokeCalls]
+        public override IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr user_data)
+        {
+            g[0] = x[0] * x[1] * x[2] * x[3];
+            g[1] = x[0] * x[0] + x[1] * x[1] + x[2] * x[2] + x[3] * x[3];
+
+            return IpoptBoolType.True;
+        }
+
+        [AllowReversePInvokeCalls]
         public override IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr user_data)
         {
             grad_f[0] = x[0] * x[3] + x[3] * (x[0] + x[1] + x[2]);
             grad_f[1] = x[0] * x[3];
             grad_f[2] = x[0] * x[3] + 1;
             grad_f[3] = x[0] * (x[0] + x[1] + x[2]);
-
-            return IpoptBoolType.True;
-        }
-
-        [AllowReversePInvokeCalls]
-        public override IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr user_data)
-        {
-            g[0] = x[0] * x[1] * x[2] * x[3];
-            g[1] = x[0] * x[0] + x[1] * x[1] + x[2] * x[2] + x[3] * x[3];
 
             return IpoptBoolType.True;
         }

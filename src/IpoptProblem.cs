@@ -254,7 +254,7 @@ namespace Cureos.Numerics
         /// <summary>
         /// Constructor for creating a new Ipopt Problem object using managed 
         /// function delegates.  This function
-        /// returns an object that can be passed to the IpoptSolve call.  It
+        /// initializes an object that can be passed to the IpoptSolve call.  It
         /// contains the basic definition of the optimization problem, such
         /// as number of variables and constraints, bounds on variables and
         /// constraints, information about the derivatives, and the callback
@@ -303,7 +303,7 @@ namespace Cureos.Numerics
         /// <summary>
         /// Constructor for creating a new Ipopt Problem object using native
         /// function delegates. This function
-        /// returns an object that can be passed to the IpoptSolve call.  It
+        /// initializes an object that can be passed to the IpoptSolve call.  It
         /// contains the basic definition of the optimization problem, such
         /// as number of variables and constraints, bounds on variables and
         /// constraints, information about the derivatives, and the callback
@@ -348,8 +348,43 @@ namespace Cureos.Numerics
             m_disposed = false;
         }
 
+        /// <summary>
+        /// Constructor for creating a subclassed Ipopt Problem object using 
+        /// native function delegates. This is the preferred constructor when
+        /// subclassing IpoptProblem. Prerequisite is that the native optimization 
+        /// function delegates are implemented in the inheriting class.
+        /// This function
+        /// initializes an object that can be passed to the IpoptSolve call.  It
+        /// contains the basic definition of the optimization problem, such
+        /// as number of variables and constraints, bounds on variables and
+        /// constraints, information about the derivatives, and the callback
+        /// function for the computation of the optimization problem
+        /// functions and derivatives. During this call, the options file
+        /// PARAMS.DAT is read as well.
+        /// </summary>
+        /// <param name="n">Number of optimization variables</param>
+        /// <param name="x_L">Lower bounds on variables. This array of size n is copied internally, so that the
+        /// caller can change the incoming data after return without that IpoptProblem is modified.  Any value 
+        /// less or equal than the number specified by option 'nlp_lower_bound_inf' is interpreted to be minus infinity.</param>
+        /// <param name="x_U">Upper bounds on variables. This array of size n is copied internally, so that the
+        /// caller can change the incoming data after return without that IpoptProblem is modified.  Any value 
+        /// greater or equal than the number specified by option 'nlp_upper_bound_inf' is interpreted to be plus infinity.</param>
+        /// <param name="m">Number of constraints.</param>
+        /// <param name="g_L">Lower bounds on constraints. This array of size m is copied internally, so that the
+        /// caller can change the incoming data after return without that IpoptProblem is modified.  Any value 
+        /// less or equal than the number specified by option 'nlp_lower_bound_inf' is interpreted to be minus infinity.</param>
+        /// <param name="g_U">Upper bounds on constraints. This array of size m is copied internally, so that the
+        /// caller can change the incoming data after return without that IpoptProblem is modified.  Any value 
+        /// greater or equal than the number specified by option 'nlp_upper_bound_inf' is interpreted to be plus infinity.</param>
+        /// <param name="nele_jac">Number of non-zero elements in constraint Jacobian.</param>
+        /// <param name="nele_hess">Number of non-zero elements in Hessian of Lagrangian.</param>
+        /// <param name="useHessianApproximation">If set to true, the Ipopt optimizer creates a limited memory
+        /// Hessian approximation and <see cref="eval_h"/> need not be implemented. If set to false, an exact Hessian
+        /// should be evaluated using <see cref="eval_h"/>.</param>
+        /// <param name="useIntermediateCallback">If set to true, the method <see cref="intermediate"/>will be called 
+        /// after each full iteration. If false, the intermediate callback function will not be called.</param>
         protected IpoptProblem(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, int nele_jac, int nele_hess,
-            bool useIntermediateCallback = false)
+            bool useHessianApproximation = false, bool useIntermediateCallback = false)
         {
             m_eval_f_cb = eval_f;
             m_eval_g_cb = eval_g;
@@ -360,6 +395,8 @@ namespace Cureos.Numerics
 
             m_problem = IpoptAdapter.CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, IpoptIndexStyle.C,
                                            m_eval_f_cb, m_eval_g_cb, m_eval_grad_f_cb, m_eval_jac_g_cb, m_eval_h_cb);
+
+            if (useHessianApproximation) AddOption("hessian_approximation", "limited-memory");
             if (useIntermediateCallback) SetIntermediateCallback(intermediate);
 
             m_disposed = false;
@@ -545,45 +582,81 @@ namespace Cureos.Numerics
 
         #endregion
 
-        #region DEFAULT DELEGATE IMPLEMENTATIONS
+        #region BASE CLASS DUMMY DELEGATE IMPLEMENTATIONS
 
+        /// <summary>
+        /// Dummy implementation of the native objective function evaluation delegate.
+        /// Recommended action is to override this method in a subclass and use
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool)">protected constructor</see>
+        /// of this base class to initialize the subclassed object.
+        /// </summary>
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType eval_f(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr user_data)
         {
-            throw new NotSupportedException("Objective function evaluation must be implemented in subclass.");
+            throw new NotSupportedException("Objective function evaluation should be implemented in subclass.");
         }
 
+        /// <summary>
+        /// Dummy implementation of the native constraints evaluation delegate.
+        /// Recommended action is to override this method in a subclass and use
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool)">protected constructor</see>
+        /// of this base class to initialize the subclassed object.
+        /// </summary>
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr user_data)
         {
-            throw new NotSupportedException("Constraints evaluation must be implemented in subclass.");
+            throw new NotSupportedException("Constraints evaluation should be implemented in subclass.");
         }
 
+        /// <summary>
+        /// Dummy implementation of the native objective function gradient evaluation delegate.
+        /// Recommended action is to override this method in a subclass and use
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool)">protected constructor</see>
+        /// of this base class to initialize the subclassed object.
+        /// </summary>
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr user_data)
         {
-            throw new NotSupportedException("Objective function gradient evaluation must be implemented in subclass.");
+            throw new NotSupportedException("Objective function gradient evaluation should be implemented in subclass.");
         }
 
+        /// <summary>
+        /// Dummy implementation of the native Jacobian evaluation delegate.
+        /// Recommended action is to override this method in a subclass and use
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool)">protected constructor</see>
+        /// of this base class to initialize the subclassed object.
+        /// </summary>
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType eval_jac_g(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac,
             int[] iRow, int[] jCol, double[] values, IntPtr user_data)
         {
-            throw new NotSupportedException("Jacobian evaluation must be implemented in subclass.");
+            throw new NotSupportedException("Jacobian evaluation should be implemented in subclass.");
         }
 
+        /// <summary>
+        /// Dummy implementation of the native Hessian evaluation delegate.
+        /// Recommended action is to override this method in a subclass and use
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool)">protected constructor</see>
+        /// of this base class to initialize the subclassed object.
+        /// </summary>
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType eval_h(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda,
             IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
         {
-            return IpoptBoolType.True;
+            throw new NotSupportedException("Hessian evaluation should be implemented in subclass.");
         }
 
+        /// <summary>
+        /// Dummy implementation of the native intermediate callback delegate.
+        /// Recommended action is to override this method in a subclass and use
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool)">protected constructor</see>
+        /// of this base class to initialize the subclassed object.
+        /// </summary>
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
             double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
         {
-            return IpoptBoolType.True;
+            throw new NotSupportedException("Intermediate callback method should be implemented in subclass.");
         }
 
         #endregion
