@@ -10,6 +10,7 @@ csipopt provides a small and simple C# interface to the Ipopt non-linear optimiz
 contained in a .NET class library, the interface is accessible via any .NET language. .NET Framework 2.0
 or higher is required.
 
+The most up-to-date usage information can be found on the wiki pages: https://github.com/cureos/csipopt/wiki
 
 == Prerequisites
 
@@ -63,7 +64,7 @@ To run the respective applications, type
   hs071_fs
 
 === Mono examples
-
+ 
 The interface is equally applicable to Mono, and can be compiled using the gmcs compiler.
 When running from the Mono command prompt, create a class library by running the batch script
 
@@ -75,9 +76,14 @@ Create an example application from the C# file Program.cs by running the batch s
 
 To run the example application, type
 
-  mono hs071_cs
+  mono hs071_cs_mono
+
+NOTE! Following recent changes in the signatures of the native callback functions, the Mono
+runtime fails when calling the native callback function implementations. However, the gmcs
+compiler appears to compile the csipopt code correctly, and gmcs compiled code can be 
+successfully executed by the regular .NET runtime.
 
 
 == Revision
 
-Last updated on December 14, 2011 by Anders Gustafsson, anders[at]cureos[dot]com, http://www.cureos.com.
+Last updated on December 18, 2011 by Anders Gustafsson, anders[at]cureos[dot]com, http://www.cureos.com.
