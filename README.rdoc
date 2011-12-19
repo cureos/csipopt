@@ -32,7 +32,7 @@ downloading.)
 To use the C# interface in your own code, simply copy the C# files Ipopt*.cs to your class library. 
 (Potentially, you may need to edit the references to Ipopt39.) 
 
-A number of build scripts are provided to demonstrate example usage of the C# Ipopt interface.
+A number of build scripts are provided in the build sub-folder to demonstrate example usage of the C# Ipopt interface.
 
 
 === Visual Studio examples
