@@ -76,6 +76,9 @@
     <Compile Include="..\..\nlp\HS071.cs">
       <Link>HS071.cs</Link>
     </Compile>
+    <Compile Include="..\..\nlp\S225.cs">
+      <Link>S225.cs</Link>
+    </Compile>
     <Compile Include="MainClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

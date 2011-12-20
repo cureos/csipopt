@@ -378,26 +378,46 @@ namespace Cureos.Numerics
         /// greater or equal than the number specified by option 'nlp_upper_bound_inf' is interpreted to be plus infinity.</param>
         /// <param name="nele_jac">Number of non-zero elements in constraint Jacobian.</param>
         /// <param name="nele_hess">Number of non-zero elements in Hessian of Lagrangian.</param>
+        /// <param name="useNativeCallbackFunctions">If set to true, native callback functions are used to setup
+        /// the Ipopt problem; if set to false, managed callback functions are used.</param>
         /// <param name="useHessianApproximation">If set to true, the Ipopt optimizer creates a limited memory
         /// Hessian approximation and <see cref="eval_h"/> need not be implemented. If set to false, an exact Hessian
         /// should be evaluated using <see cref="eval_h"/>.</param>
         /// <param name="useIntermediateCallback">If set to true, the method <see cref="intermediate"/>will be called 
         /// after each full iteration. If false, the intermediate callback function will not be called.</param>
         protected IpoptProblem(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, int nele_jac, int nele_hess,
-            bool useHessianApproximation = false, bool useIntermediateCallback = false)
+            bool useNativeCallbackFunctions = false, bool useHessianApproximation = false, bool useIntermediateCallback = false)
         {
-            m_eval_f_cb = eval_f;
-            m_eval_g_cb = eval_g;
-            m_eval_grad_f_cb = eval_grad_f;
-            m_eval_jac_g_cb = eval_jac_g;
-            m_eval_h_cb = eval_h;
+            if (useNativeCallbackFunctions)
+            {
+                m_eval_f_cb = eval_f;
+                m_eval_g_cb = eval_g;
+                m_eval_grad_f_cb = eval_grad_f;
+                m_eval_jac_g_cb = eval_jac_g;
+                m_eval_h_cb = eval_h;
+            }
+            else
+            {
+                m_eval_f_cb = new ObjectiveEvaluator(eval_f).Evaluate;
+                m_eval_g_cb = new ConstraintsEvaluator(eval_g).Evaluate;
+                m_eval_grad_f_cb = new ObjectiveGradientEvaluator(eval_grad_f).Evaluate;
+                m_eval_jac_g_cb = new JacobianEvaluator(eval_jac_g).Evaluate;
+                m_eval_h_cb = new HessianEvaluator(eval_h).Evaluate;
+            }
             m_intermediate_cb = null;
 
             m_problem = IpoptAdapter.CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, IpoptIndexStyle.C,
                                            m_eval_f_cb, m_eval_g_cb, m_eval_grad_f_cb, m_eval_jac_g_cb, m_eval_h_cb);
 
             if (useHessianApproximation) AddOption("hessian_approximation", "limited-memory");
-            if (useIntermediateCallback) SetIntermediateCallback(intermediate);
+
+            if (useIntermediateCallback)
+            {
+                if (useNativeCallbackFunctions)
+                    SetIntermediateCallback((Intermediate_CB)intermediate);
+                else
+                    SetIntermediateCallback((IntermediateDelegate)intermediate);
+            }
 
             m_disposed = false;
         }
@@ -582,12 +602,12 @@ namespace Cureos.Numerics
 
         #endregion
 
-        #region BASE CLASS DUMMY DELEGATE IMPLEMENTATIONS
+        #region BASE CLASS NATIVE CALLBACK IMPLEMENTATIONS
 
         /// <summary>
         /// Dummy implementation of the native objective function evaluation delegate.
         /// Recommended action is to override this method in a subclass and use
-        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool)">protected constructor</see>
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
         /// of this base class to initialize the subclassed object.
         /// </summary>
         [AllowReversePInvokeCalls]
@@ -599,7 +619,7 @@ namespace Cureos.Numerics
         /// <summary>
         /// Dummy implementation of the native constraints evaluation delegate.
         /// Recommended action is to override this method in a subclass and use
-        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool)">protected constructor</see>
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
         /// of this base class to initialize the subclassed object.
         /// </summary>
         [AllowReversePInvokeCalls]
@@ -611,7 +631,7 @@ namespace Cureos.Numerics
         /// <summary>
         /// Dummy implementation of the native objective function gradient evaluation delegate.
         /// Recommended action is to override this method in a subclass and use
-        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool)">protected constructor</see>
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
         /// of this base class to initialize the subclassed object.
         /// </summary>
         [AllowReversePInvokeCalls]
@@ -623,7 +643,7 @@ namespace Cureos.Numerics
         /// <summary>
         /// Dummy implementation of the native Jacobian evaluation delegate.
         /// Recommended action is to override this method in a subclass and use
-        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool)">protected constructor</see>
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
         /// of this base class to initialize the subclassed object.
         /// </summary>
         [AllowReversePInvokeCalls]
@@ -636,7 +656,7 @@ namespace Cureos.Numerics
         /// <summary>
         /// Dummy implementation of the native Hessian evaluation delegate.
         /// Recommended action is to override this method in a subclass and use
-        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool)">protected constructor</see>
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
         /// of this base class to initialize the subclassed object.
         /// </summary>
         [AllowReversePInvokeCalls]
@@ -649,12 +669,84 @@ namespace Cureos.Numerics
         /// <summary>
         /// Dummy implementation of the native intermediate callback delegate.
         /// Recommended action is to override this method in a subclass and use
-        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool)">protected constructor</see>
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
         /// of this base class to initialize the subclassed object.
         /// </summary>
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
             double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
+        {
+            throw new NotSupportedException("Intermediate callback method should be implemented in subclass.");
+        }
+
+        #endregion
+
+        #region BASE CLASS OVERRIDABLE MANAGED CALLBACK IMPLEMENTATIONS
+
+        /// <summary>
+        /// Dummy implementation of the managed objective function evaluation delegate.
+        /// Recommended action is to override this method in a subclass and use
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
+        /// of this base class to initialize the subclassed object.
+        /// </summary>
+        public virtual bool eval_f(int n, double[] x, bool new_x, out double obj_value)
+        {
+            throw new NotSupportedException("Objective function evaluation should be implemented in subclass.");
+        }
+
+        /// <summary>
+        /// Dummy implementation of the managed constraints evaluation delegate.
+        /// Recommended action is to override this method in a subclass and use
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
+        /// of this base class to initialize the subclassed object.
+        /// </summary>
+        public virtual bool eval_g(int n, double[] x, bool new_x, int m, double[] g)
+        {
+            throw new NotSupportedException("Contraints evaluation should be implemented in subclass.");
+        }
+
+        /// <summary>
+        /// Dummy implementation of the managed objective function gradient evaluation delegate.
+        /// Recommended action is to override this method in a subclass and use
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
+        /// of this base class to initialize the subclassed object.
+        /// </summary>
+        public virtual bool eval_grad_f(int n, double[] x, bool new_x, double[] grad_f)
+        {
+            throw new NotSupportedException("Objective function gradient evaluation should be implemented in subclass.");
+        }
+
+        /// <summary>
+        /// Dummy implementation of the managed Jacobian evaluation delegate.
+        /// Recommended action is to override this method in a subclass and use
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
+        /// of this base class to initialize the subclassed object.
+        /// </summary>
+        public virtual bool eval_jac_g(int n, double[] x, bool new_x, int m, int nele_jac, int[] iRow, int[] jCol, double[] values)
+        {
+            throw new NotSupportedException("Jacobian evaluation should be implemented in subclass.");
+        }
+
+        /// <summary>
+        /// Dummy implementation of the managed Hessian evaluation delegate.
+        /// Recommended action is to override this method in a subclass and use
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
+        /// of this base class to initialize the subclassed object.
+        /// </summary>
+        public virtual bool eval_h(int n, double[] x, bool new_x, double obj_factor, int m, double[] lambda, bool new_lambda,
+                    int nele_hess, int[] iRow, int[] jCol, double[] values)
+        {
+            throw new NotSupportedException("Hessian evaluation should be implemented in subclass.");
+        }
+
+        /// <summary>
+        /// Dummy implementation of the managed intermediate callback method delegate.
+        /// Recommended action is to override this method in a subclass and use
+        /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
+        /// of this base class to initialize the subclassed object.
+        /// </summary>
+        public virtual bool intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
+            double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials)
         {
             throw new NotSupportedException("Intermediate callback method should be implemented in subclass.");
         }
