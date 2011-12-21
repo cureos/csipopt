@@ -12,6 +12,8 @@ namespace hs071_cs
     {
         public static void Main(string[] args)
         {
+            Console.WriteLine("HS071{0}====={0}", Environment.NewLine);
+
             /* allocate space for the initial point and set the values */
             double[] x = { 1.0, 5.0, 5.0, 1.0 };
 
@@ -35,6 +37,8 @@ namespace hs071_cs
 
             for (int i = 0; i < 4; ++i) Console.WriteLine("x[{0}]={1}", i, x[i]);
 
+            Console.WriteLine("{0}{0}Schittkowski #225{0}================={0}", Environment.NewLine);
+
             /* Next, solve the Schittkowski no. 225 problem */
             x = new[] { 3.0, 1.0 };
 
@@ -42,8 +46,6 @@ namespace hs071_cs
             {
                 // Set some options.  The following ones are only examples,
                 // they might not be suitable for your problem.
-                s225.AddOption("tol", 1e-7);
-                s225.AddOption("mu_strategy", "adaptive");
                 s225.AddOption("output_file", "s225.txt");
 
                 // Solve the problem.

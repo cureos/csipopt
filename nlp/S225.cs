@@ -3,7 +3,6 @@
 //
 // Author:  Anders Gustafsson, Cureos AB 2010-12-20
 
-using System;
 using Cureos.Numerics;
 
 namespace hs071_cs
@@ -16,17 +15,17 @@ namespace hs071_cs
     {
         public S225()
             : base(
-            2,
-            new[] { NegativeInfinity, NegativeInfinity },
-            new[] { PositiveInfinity, PositiveInfinity },
-            5,
-            new[] { 1.0, 1.0, 9.0, 0.0, 0.0 },
-            new[] { PositiveInfinity, PositiveInfinity, PositiveInfinity, PositiveInfinity, PositiveInfinity },
-            10,
-            0,
-            false,
-            true,
-            false)
+            2,  // Number of variables
+            new[] { NegativeInfinity, NegativeInfinity },   // Lower variable bounds
+            new[] { PositiveInfinity, PositiveInfinity },   // Upper varable bounds
+            5,  // Number of constraints
+            new[] { 1.0, 1.0, 9.0, 0.0, 0.0 },  // Lower constraint bounds
+            new[] { PositiveInfinity, PositiveInfinity, PositiveInfinity, PositiveInfinity, PositiveInfinity }, // Upper constraint bounds
+            10, // Number of elements in (sparse) Jacobian
+            0,  // Number of elements in (sparse) Hessian; 0 since Hessian approximation is applied
+            false,  // Use native callback functions?
+            true,   // Use limited-memory Hessian approximation?
+            false)  // Use intermediate callback function?
         {
         }
 

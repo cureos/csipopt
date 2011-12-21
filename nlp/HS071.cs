@@ -20,10 +20,10 @@ namespace Cureos.Numerics
             new[] { PositiveInfinity, 40.0 },
             8,  // Number of nonzeros in the Jacobian of the constraints
             10, // Number of nonzeros in the Hessian of the Lagrangian (lower or upper triangual part only)
-            true     // Use native callback functions,
+            true    // Use native callback functions,
 #if INTERMEDIATE
-            , false  // Use limited-memory Hessian approximation?
-            , true   // Use intermediate callback function?
+            , false // Use limited-memory Hessian approximation?
+            , true  // Use intermediate callback function?
 #endif
             )
         {
