@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SL.Cureos.Numerics", "SL.Cu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hs071_sl", "hs071_sl\hs071_sl.csproj", "{78D89079-A935-499F-80B4-158CDE358EC4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Cureos.Numerics", "Tests.Cureos.Numerics\Tests.Cureos.Numerics.csproj", "{41941299-D389-48A2-B8B8-331AC8851477}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -49,6 +51,14 @@ Global
 		{78D89079-A935-499F-80B4-158CDE358EC4}.Release|x64.Build.0 = Release|Any CPU
 		{78D89079-A935-499F-80B4-158CDE358EC4}.Release|x86.ActiveCfg = Release|Any CPU
 		{78D89079-A935-499F-80B4-158CDE358EC4}.Release|x86.Build.0 = Release|Any CPU
+		{41941299-D389-48A2-B8B8-331AC8851477}.Debug|x64.ActiveCfg = Debug|x64
+		{41941299-D389-48A2-B8B8-331AC8851477}.Debug|x64.Build.0 = Debug|x64
+		{41941299-D389-48A2-B8B8-331AC8851477}.Debug|x86.ActiveCfg = Debug|x86
+		{41941299-D389-48A2-B8B8-331AC8851477}.Debug|x86.Build.0 = Debug|x86
+		{41941299-D389-48A2-B8B8-331AC8851477}.Release|x64.ActiveCfg = Release|x64
+		{41941299-D389-48A2-B8B8-331AC8851477}.Release|x64.Build.0 = Release|x64
+		{41941299-D389-48A2-B8B8-331AC8851477}.Release|x86.ActiveCfg = Release|x86
+		{41941299-D389-48A2-B8B8-331AC8851477}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
