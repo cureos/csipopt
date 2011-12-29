@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace Cureos.Numerics
 {
     [TestFixture]
-    public class NativeSubclassingTests
+    public class HS040NativeTests
     {
         #region Unit tests
 
@@ -77,7 +77,27 @@ namespace Cureos.Numerics
             instance.SolveProblem(x, out obj, null, null, null, null);
             var actual = instance.NumberIterations;
 
+            Assert.Greater(actual, 0);
             Assert.Less(actual, expected);
+        }
+
+        [Test]
+        public void SolveProblem_ExactHessian_NumberOfIterationsLessThanOrEqualToHessianApprox()
+        {
+            // Get number of iterations for Hessian approximation
+            var approx = new HS040(true, true, true);
+            var x = new[] { 0.8, 0.8, 0.8, 0.8 };
+            double obj;
+            approx.SolveProblem(x, out obj, null, null, null, null);
+            var expected = approx.NumberIterations;
+
+            // Get number of iterations for exact Hessian
+            var exact = new HS040(true, false, true);
+            x = new[] { 0.8, 0.8, 0.8, 0.8 };
+            exact.SolveProblem(x, out obj, null, null, null, null);
+            var actual = exact.NumberIterations;
+
+            Assert.LessOrEqual(actual, expected);
         }
 
         #endregion

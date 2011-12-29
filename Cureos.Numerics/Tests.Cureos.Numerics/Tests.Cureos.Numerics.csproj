@@ -97,7 +97,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NativeSubclassingTests.cs" />
+    <Compile Include="HS040NativeTests.cs" />
     <Compile Include="Nlp\HS040.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\DoubleComparer.cs" />

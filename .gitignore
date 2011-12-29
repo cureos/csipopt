@@ -24,3 +24,4 @@ Ipopt*.dll
 /Cureos.Numerics/Tests.Cureos.Numerics/bin/
 /Cureos.Numerics/Tests.Cureos.Numerics/obj/
 /Cureos.Numerics/packages/*/
+*.nb

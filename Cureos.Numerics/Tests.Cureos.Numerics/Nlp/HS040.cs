@@ -137,7 +137,33 @@ namespace Cureos.Numerics.Nlp
             }
             else
             {
-                // TODO Implement Hessian calculation
+                /* fill the objective portion */
+                values[0] = 0.0;                            /* 0,0 */
+
+                values[1] = obj_factor * (-x[2] * x[3]);    /* 1,0 */
+                values[2] = 0.0;                            /* 1,1 */
+
+                values[3] = obj_factor * (-x[1] * x[3]);    /* 2,0 */
+                values[4] = obj_factor * (-x[0] * x[3]);    /* 2,1 */
+                values[5] = 0.0;                            /* 2,2 */
+
+                values[6] = obj_factor * (-x[1] * x[2]);    /* 3,0 */
+                values[7] = obj_factor * (-x[0] * x[2]);    /* 3,1 */
+                values[8] = obj_factor * (-x[0] * x[1]);    /* 3,2 */
+                values[9] = 0.0;                            /* 3,3 */
+
+                /* add the portion for the first constraint */
+                values[0] += lambda[0] * (6.0 * x[0]);                      /* 0,0 */
+
+                values[2] += lambda[0] * 2.0;                               /* 1,1 */
+
+                /* add the portion for the second constraint */
+                values[0] += lambda[1] * (2.0 * x[3]);                      /* 0,0 */
+
+                values[6] += lambda[1] * (2.0 * x[0]);                      /* 3,0 */
+
+                /* add the portion for the third constraint */
+                values[9] += lambda[2] * 2.0;                               /* 3,3 */
             }
             return IpoptBoolType.True;
         }
