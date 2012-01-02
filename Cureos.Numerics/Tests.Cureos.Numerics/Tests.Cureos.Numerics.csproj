@@ -99,7 +99,11 @@
   <ItemGroup>
     <Compile Include="HS040ManagedTests.cs" />
     <Compile Include="HS040NativeTests.cs" />
+    <Compile Include="HS071NativeTests.cs" />
     <Compile Include="Nlp\HS040.cs" />
+    <Compile Include="Nlp\HS071.cs" />
+    <Compile Include="Nlp\HS037.cs" />
+    <Compile Include="Nlp\S225.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\DoubleComparer.cs" />
   </ItemGroup>
