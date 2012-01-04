@@ -8,6 +8,7 @@ namespace Cureos.Numerics.Nlp
     /// <summary>
     /// C# implementation of Schittkowski problem no. 225
     /// Adapted from http://www.orfe.princeton.edu/~rvdb/ampl/nlmodels/s/s225.mod
+    /// Optimal solution x* = { 1; 1 }, f* = 2
     /// </summary>
     public class S225 : IpoptProblem
     {

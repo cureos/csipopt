@@ -111,7 +111,6 @@ namespace Cureos.Numerics.Nlp
         public IpoptBoolType intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
             double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
         {
-            System.Windows.MessageBox.Show(String.Format("Iteration: {0}, obj value: {1}", iter_count, obj_value));
             return IpoptBoolType.True;
         }
 #endif
