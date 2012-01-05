@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cureos.Numerics", "Cureos.Numerics\Cureos.Numerics.csproj", "{42CE61EC-A12B-4929-843D-453CE7A98D7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hs071_cs", "hs071_cs\hs071_cs.csproj", "{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SL.Cureos.Numerics", "SL.Cureos.Numerics\SL.Cureos.Numerics.csproj", "{4E85C8B3-7954-46E3-A506-6DE6AE82F0F9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hs071_sl", "hs071_sl\hs071_sl.csproj", "{78D89079-A935-499F-80B4-158CDE358EC4}"
@@ -27,14 +25,6 @@ Global
 		{42CE61EC-A12B-4929-843D-453CE7A98D7D}.Release|x64.Build.0 = Release|x64
 		{42CE61EC-A12B-4929-843D-453CE7A98D7D}.Release|x86.ActiveCfg = Release|x86
 		{42CE61EC-A12B-4929-843D-453CE7A98D7D}.Release|x86.Build.0 = Release|x86
-		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Debug|x64.ActiveCfg = Debug|x64
-		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Debug|x64.Build.0 = Debug|x64
-		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Debug|x86.ActiveCfg = Debug|x86
-		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Debug|x86.Build.0 = Debug|x86
-		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Release|x64.ActiveCfg = Release|x64
-		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Release|x64.Build.0 = Release|x64
-		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Release|x86.ActiveCfg = Release|x86
-		{84B0E69F-4B4F-4F7D-9B32-217C6055CD0A}.Release|x86.Build.0 = Release|x86
 		{4E85C8B3-7954-46E3-A506-6DE6AE82F0F9}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{4E85C8B3-7954-46E3-A506-6DE6AE82F0F9}.Debug|x64.Build.0 = Debug|Any CPU
 		{4E85C8B3-7954-46E3-A506-6DE6AE82F0F9}.Debug|x86.ActiveCfg = Debug|Any CPU

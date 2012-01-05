@@ -71,11 +71,11 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\nlp\HS071.cs">
-      <Link>HS071.cs</Link>
+    <Compile Include="..\Tests.Cureos.Numerics\Nlp\HS037.cs">
+      <Link>HS037.cs</Link>
     </Compile>
-    <Compile Include="..\..\nlp\RosenbrockPostOffice.cs">
-      <Link>RosenbrockPostOffice.cs</Link>
+    <Compile Include="..\Tests.Cureos.Numerics\Nlp\HS071.cs">
+      <Link>HS071.cs</Link>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>

@@ -8,6 +8,7 @@ using System;
 using System.Text;
 using System.Windows;
 using Cureos.Numerics;
+using Cureos.Numerics.Nlp;
 
 namespace hs071_sl
 {
@@ -48,15 +49,12 @@ namespace hs071_sl
                 output.AppendLine();
 
                 // Also optimize Rosenbrock post office problem
-                var r = new RosenbrockPostOffice();
+                var r = new HS037();
                 var rosenbrock = IpoptAdapter.CreateIpoptProblem(r._n, r._x_L, r._x_U, r._m, r._g_L, r._g_U, r._nele_jac,
                                                          r._nele_hess, IpoptIndexStyle.C,
                                                          r.eval_f, r.eval_g, r.eval_grad_f, r.eval_jac_g, r.eval_h);
                 IpoptAdapter.AddIpoptStrOption(rosenbrock, "hessian_approximation", "limited-memory");
                 IpoptAdapter.AddIpoptIntOption(rosenbrock, "limited_memory_max_history", 5);
-#if INTERMEDIATE
-                IpoptAdapter.SetIntermediateCallback(problem, r.intermediate);
-#endif
 
                 x = new[] { 10.0, 10.0, 10.0 };
                 status = IpoptAdapter.IpoptSolve(rosenbrock, x, null, out obj, null, null, null, IntPtr.Zero);
