@@ -5,6 +5,7 @@
 // http://www.eclipse.org/legal/epl-v10.html
 
 using System;
+using System.IO;
 using Cureos.Numerics.Nlp;
 using Cureos.Numerics.Support;
 using NUnit.Framework;
@@ -74,7 +75,22 @@ namespace Cureos.Numerics
             Assert.AreEqual(expected, actual, 2.0e-7);
         }
 
-        // TODO Add test to verify output to file
+        [Test]
+        public void AddOption_SpecifyingOutputFile_OutputFileGeneratedUponSolve()
+        {
+            const string logFileName = "s225.txt";
+            if (File.Exists(logFileName)) File.Delete(logFileName);
+
+            var x = new[] { 3.0, 1.0 };
+            double obj;
+            _instance.AddOption("output_file", logFileName);
+            _instance.SolveProblem(x, out obj, null, null, null, null);
+
+            const bool expected = true;
+            var actual = File.Exists(logFileName);
+
+            Assert.AreEqual(expected, actual);
+        }
 
         #endregion
     }

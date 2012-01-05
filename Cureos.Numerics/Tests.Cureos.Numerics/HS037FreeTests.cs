@@ -16,6 +16,7 @@ namespace Cureos.Numerics
     {
         #region Fields
 
+        private HS037 _hs037;
         private IntPtr _instance;
 
         #endregion
@@ -25,11 +26,11 @@ namespace Cureos.Numerics
         [SetUp]
         public void Setup()
         {
-            var hs037 = new HS037();
-            _instance = IpoptAdapter.CreateIpoptProblem(hs037._n, hs037._x_L, hs037._x_U, hs037._m, hs037._g_L,
-                                                        hs037._g_U, hs037._nele_jac, hs037._nele_hess, IpoptIndexStyle.C,
-                                                        hs037.eval_f, hs037.eval_g, hs037.eval_grad_f, hs037.eval_jac_g,
-                                                        hs037.eval_h);
+            _hs037 = new HS037();
+            _instance = IpoptAdapter.CreateIpoptProblem(_hs037._n, _hs037._x_L, _hs037._x_U, _hs037._m, _hs037._g_L,
+                                                        _hs037._g_U, _hs037._nele_jac, _hs037._nele_hess, IpoptIndexStyle.C,
+                                                        _hs037.eval_f, _hs037.eval_g, _hs037.eval_grad_f, _hs037.eval_jac_g,
+                                                        _hs037.eval_h);
             IpoptAdapter.AddIpoptStrOption(_instance, "hessian_approximation", "limited-memory");
             IpoptAdapter.AddIpoptIntOption(_instance, "limited_memory_max_history", 5);
         }
@@ -38,6 +39,7 @@ namespace Cureos.Numerics
         public void Teardown()
         {
             IpoptAdapter.FreeIpoptProblem(_instance);
+            _hs037 = null;
         }
 
         #endregion
@@ -79,6 +81,20 @@ namespace Cureos.Numerics
             Assert.AreEqual(expected, actual, 1.0e-3);
         }
 
+        [Test]
+        public void SetIntermediateCallback_CallbackFunctionDefined_CallbackFunctionCalled()
+        {
+            const bool expected = true;
+            IpoptAdapter.SetIntermediateCallback(_instance, _hs037.intermediate);
+            _hs037.hasIntermediateBeenCalled = false;
+
+            var x = new[] { 10.0, 10.0, 10.0 };
+            double obj;
+            IpoptAdapter.IpoptSolve(_instance, x, null, out obj, null, null, null, IntPtr.Zero);
+            var actual = _hs037.hasIntermediateBeenCalled;
+
+            Assert.AreEqual(expected, actual);
+        }
         // TODO Add test to verify that intermediate function is called
 
         #endregion

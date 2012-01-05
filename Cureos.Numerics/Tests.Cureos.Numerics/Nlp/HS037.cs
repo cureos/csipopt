@@ -16,6 +16,8 @@ namespace Cureos.Numerics.Nlp
     /// </summary>
     public class HS037
     {
+        public bool hasIntermediateBeenCalled;
+
         public int _n;
         public int _m;
         public int _nele_jac;
@@ -106,13 +108,12 @@ namespace Cureos.Numerics.Nlp
             return IpoptBoolType.True;
         }
 
-#if INTERMEDIATE
         [AllowReversePInvokeCalls]
         public IpoptBoolType intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
             double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
         {
+            hasIntermediateBeenCalled = true;
             return IpoptBoolType.True;
         }
-#endif
     }
 }
