@@ -198,10 +198,10 @@ namespace Cureos.Numerics
         /// <param name="eval_h">Callback function for evaluating Hessian of Lagrangian function</param>
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr CreateIpoptProblem(
-            int n, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x_L,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x_U, int m,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] double[] g_L,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] double[] g_U, int nele_jac,
+            int n, double[] x_L,
+            double[] x_U, int m,
+            double[] g_L,
+            double[] g_U, int nele_jac,
             int nele_hess, IpoptIndexStyle index_style, 
             Eval_F_CB eval_f, Eval_G_CB eval_g, Eval_Grad_F_CB eval_grad_f, Eval_Jac_G_CB eval_jac_g, Eval_H_CB eval_h);
 
@@ -267,8 +267,7 @@ namespace Cureos.Numerics
         /// <returns>true if scaling succeeded, false otherwise</returns>
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern IpoptBoolType SetIpoptProblemScaling(
-            IntPtr ipopt_problem, double obj_scaling,
-            [MarshalAs(UnmanagedType.LPArray)] double[] x_scaling, [MarshalAs(UnmanagedType.LPArray)] double[] g_scaling);
+            IntPtr ipopt_problem, double obj_scaling, double[] x_scaling, double[] g_scaling);
 
         /// <summary>
         /// Setting a callback function for the "intermediate callback"
@@ -301,10 +300,8 @@ namespace Cureos.Numerics
         /// <param name="user_data">Optional pointer to user data</param>
         /// <returns>Outcome of the optimization procedure (e.g., success, failure etc).</returns>
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IpoptReturnCode IpoptSolve(
-            IntPtr ipopt_problem, [MarshalAs(UnmanagedType.LPArray)] double[] x, [MarshalAs(UnmanagedType.LPArray)] double[] g,
-            out double obj_val, [MarshalAs(UnmanagedType.LPArray)] double[] mult_g,
-            [MarshalAs(UnmanagedType.LPArray)] double[] mult_x_L, [MarshalAs(UnmanagedType.LPArray)] double[] mult_x_U, IntPtr user_data);
+        public static extern IpoptReturnCode IpoptSolve(IntPtr ipopt_problem, double[] x, double[] g,
+            out double obj_val, double[] mult_g, double[] mult_x_L, double[] mult_x_U, IntPtr user_data);
 
         #endregion
     }
