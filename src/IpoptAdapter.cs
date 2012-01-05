@@ -22,10 +22,8 @@ namespace Cureos.Numerics
     /// <param name="user_data">Optional pointer to user defined data</param>
     /// <returns>true if evaluation succeeded, false otherwise</returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.I4)]
-    public delegate IpoptBoolType Eval_F_CB(
-    [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-    [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.R8)] out double obj_value, IntPtr user_data);
+    public delegate IpoptBoolType Eval_F_CB(int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
+    IpoptBoolType new_x, out double obj_value, IntPtr user_data);
 
     /// <summary>
     /// Delegate defining the callback function for evaluating the gradient of
@@ -39,11 +37,8 @@ namespace Cureos.Numerics
     /// <param name="user_data">Optional pointer to user defined data</param>
     /// <returns>true if evaluation succeeded, false otherwise</returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.I4)]
-    public delegate IpoptBoolType Eval_Grad_F_CB(
-    [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-    [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] grad_f,
-    IntPtr user_data);
+    public delegate IpoptBoolType Eval_Grad_F_CB(int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
+    IpoptBoolType new_x, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] grad_f, IntPtr user_data);
 
     /// <summary>
     /// Delegate defining the callback function for evaluating the value of
@@ -58,11 +53,8 @@ namespace Cureos.Numerics
     /// <param name="user_data">Optional pointer to user defined data</param>
     /// <returns>true if evaluation succeeded, false otherwise</returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.I4)]
-    public delegate IpoptBoolType Eval_G_CB(
-    [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-    [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.I4)] int m,
-    [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] double[] g, IntPtr user_data);
+    public delegate IpoptBoolType Eval_G_CB(int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
+    IpoptBoolType new_x, int m, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] double[] g, IntPtr user_data);
 
     /// <summary>
     /// Delegate defining the callback function for evaluating the Jacobian of
@@ -80,11 +72,8 @@ namespace Cureos.Numerics
     /// <param name="user_data">Optional pointer to user defined data</param>
     /// <returns>true if evaluation succeeded, false otherwise</returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.I4)]
-    public delegate IpoptBoolType Eval_Jac_G_CB(
-    [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-    [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.I4)] int m,
-    [MarshalAs(UnmanagedType.I4)] int nele_jac,
+    public delegate IpoptBoolType Eval_Jac_G_CB(int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
+    IpoptBoolType new_x, int m, int nele_jac,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] iRow,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] jCol,
     [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] values, IntPtr user_data);
@@ -108,12 +97,9 @@ namespace Cureos.Numerics
     /// <param name="user_data">Optional pointer to user defined data</param>
     /// <returns>true if evaluation succeeded, false otherwise</returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.I4)]
-    public delegate IpoptBoolType Eval_H_CB(
-    [MarshalAs(UnmanagedType.I4)] int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-    [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_x, [MarshalAs(UnmanagedType.R8)] double obj_factor,
-    [MarshalAs(UnmanagedType.I4)] int m, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] lambda,
-    [MarshalAs(UnmanagedType.I4)] IpoptBoolType new_lambda, [MarshalAs(UnmanagedType.I4)] int nele_hess,
+    public delegate IpoptBoolType Eval_H_CB(int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
+    IpoptBoolType new_x, double obj_factor, int m, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] lambda,
+    IpoptBoolType new_lambda, int nele_hess,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] iRow,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] jCol,
     [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] double[] values, IntPtr user_data);
@@ -144,14 +130,9 @@ namespace Cureos.Numerics
     /// <returns>true if the optimization should proceeded after callback return, false if
     /// the optimization should be terminated prematurely</returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.I4)]
-    public delegate IpoptBoolType Intermediate_CB(
-    [MarshalAs(UnmanagedType.I4)] IpoptAlgorithmMode alg_mod, [MarshalAs(UnmanagedType.I4)] int iter_count,
-    [MarshalAs(UnmanagedType.R8)] double obj_value, [MarshalAs(UnmanagedType.R8)] double inf_pr,
-    [MarshalAs(UnmanagedType.R8)] double inf_du, [MarshalAs(UnmanagedType.R8)] double mu,
-    [MarshalAs(UnmanagedType.R8)] double d_norm, [MarshalAs(UnmanagedType.R8)] double regularization_size,
-    [MarshalAs(UnmanagedType.R8)] double alpha_du, [MarshalAs(UnmanagedType.R8)] double alpha_pr,
-    [MarshalAs(UnmanagedType.I4)] int ls_trials, IntPtr user_data);
+    public delegate IpoptBoolType Intermediate_CB(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr,
+    double inf_du, double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, 
+    IntPtr user_data);
 
     #endregion
 
@@ -197,12 +178,8 @@ namespace Cureos.Numerics
         /// <param name="eval_jac_g">Callback function for evaluating Jacobian of constraint functions</param>
         /// <param name="eval_h">Callback function for evaluating Hessian of Lagrangian function</param>
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr CreateIpoptProblem(
-            int n, double[] x_L,
-            double[] x_U, int m,
-            double[] g_L,
-            double[] g_U, int nele_jac,
-            int nele_hess, IpoptIndexStyle index_style, 
+        public static extern IntPtr CreateIpoptProblem(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, 
+            int nele_jac, int nele_hess, IpoptIndexStyle index_style, 
             Eval_F_CB eval_f, Eval_G_CB eval_g, Eval_Grad_F_CB eval_grad_f, Eval_Jac_G_CB eval_jac_g, Eval_H_CB eval_h);
 
         /// <summary>
