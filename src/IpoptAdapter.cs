@@ -198,11 +198,11 @@ namespace Cureos.Numerics
         /// <param name="eval_h">Callback function for evaluating Hessian of Lagrangian function</param>
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr CreateIpoptProblem(
-            [MarshalAs(UnmanagedType.I4)] int n, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x_L,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x_U, [MarshalAs(UnmanagedType.I4)] int m,
+            int n, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x_L,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x_U, int m,
             [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] double[] g_L,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] double[] g_U, [MarshalAs(UnmanagedType.I4)] int nele_jac,
-            [MarshalAs(UnmanagedType.I4)] int nele_hess, [MarshalAs(UnmanagedType.I4)] IpoptIndexStyle index_style, 
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] double[] g_U, int nele_jac,
+            int nele_hess, IpoptIndexStyle index_style, 
             Eval_F_CB eval_f, Eval_G_CB eval_g, Eval_Grad_F_CB eval_grad_f, Eval_Jac_G_CB eval_jac_g, Eval_H_CB eval_h);
 
         /// <summary>
@@ -220,9 +220,7 @@ namespace Cureos.Numerics
         /// <param name="val">String value of option</param>
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
-        public static extern IpoptBoolType AddIpoptStrOption(
-            IntPtr ipopt_problem, [MarshalAs(UnmanagedType.LPStr)] string keyword, [MarshalAs(UnmanagedType.LPStr)] string val);
+        public static extern IpoptBoolType AddIpoptStrOption(IntPtr ipopt_problem, string keyword, string val);
 
         /// <summary>
         /// Function for adding a floating point option.
@@ -232,9 +230,7 @@ namespace Cureos.Numerics
         /// <param name="val">Floating point value of option</param>
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
-        public static extern IpoptBoolType AddIpoptNumOption(
-            IntPtr ipopt_problem, [MarshalAs(UnmanagedType.LPStr)] string keyword, [MarshalAs(UnmanagedType.R8)] double val);
+        public static extern IpoptBoolType AddIpoptNumOption(IntPtr ipopt_problem, string keyword, double val);
 
         /// <summary>
         /// Function for adding an integer option.
@@ -244,9 +240,7 @@ namespace Cureos.Numerics
         /// <param name="val">Integer value of option</param>
         /// <returns>true if setting option succeeded, false if the option could not be set (e.g., if keyword is unknown)</returns>
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
-        public static extern IpoptBoolType AddIpoptIntOption(
-            IntPtr ipopt_problem, [MarshalAs(UnmanagedType.LPStr)] string keyword, [MarshalAs(UnmanagedType.I4)] int val);
+        public static extern IpoptBoolType AddIpoptIntOption(IntPtr ipopt_problem, string keyword, int val);
 
 #if !SILVERLIGHT
         /// <summary>
@@ -257,9 +251,7 @@ namespace Cureos.Numerics
         /// <param name="print_level">Level of printed information</param>
         /// <returns>False, if there was a problem opening the file.</returns>
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
-        public static extern IpoptBoolType OpenIpoptOutputFile(
-            IntPtr ipopt_problem, [MarshalAs(UnmanagedType.LPStr)] string file_name, [MarshalAs(UnmanagedType.I4)] int print_level);
+        public static extern IpoptBoolType OpenIpoptOutputFile(IntPtr ipopt_problem, string file_name, int print_level);
 #endif
 
         /// <summary>
@@ -274,9 +266,8 @@ namespace Cureos.Numerics
         /// <param name="g_scaling">Scaling of the constraint functions</param>
         /// <returns>true if scaling succeeded, false otherwise</returns>
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
         public static extern IpoptBoolType SetIpoptProblemScaling(
-            IntPtr ipopt_problem, [MarshalAs(UnmanagedType.R8)] double obj_scaling,
+            IntPtr ipopt_problem, double obj_scaling,
             [MarshalAs(UnmanagedType.LPArray)] double[] x_scaling, [MarshalAs(UnmanagedType.LPArray)] double[] g_scaling);
 
         /// <summary>
@@ -294,7 +285,6 @@ namespace Cureos.Numerics
         /// <param name="intermediate_cb">Intermediate callback function</param>
         /// <returns>true if the callback function could be set successfully, false otherwise</returns>
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
         public static extern IpoptBoolType SetIntermediateCallback(IntPtr ipopt_problem, Intermediate_CB intermediate_cb);
 
         /// <summary>
@@ -311,10 +301,9 @@ namespace Cureos.Numerics
         /// <param name="user_data">Optional pointer to user data</param>
         /// <returns>Outcome of the optimization procedure (e.g., success, failure etc).</returns>
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I4)]
         public static extern IpoptReturnCode IpoptSolve(
             IntPtr ipopt_problem, [MarshalAs(UnmanagedType.LPArray)] double[] x, [MarshalAs(UnmanagedType.LPArray)] double[] g,
-            [MarshalAs(UnmanagedType.R8)] out double obj_val, [MarshalAs(UnmanagedType.LPArray)] double[] mult_g,
+            out double obj_val, [MarshalAs(UnmanagedType.LPArray)] double[] mult_g,
             [MarshalAs(UnmanagedType.LPArray)] double[] mult_x_L, [MarshalAs(UnmanagedType.LPArray)] double[] mult_x_U, IntPtr user_data);
 
         #endregion
