@@ -4,7 +4,6 @@
 // which accompanies this distribution, and is available at
 // http://www.eclipse.org/legal/epl-v10.html
 
-using System;
 using System.IO;
 using Cureos.Numerics.Nlp;
 using Cureos.Numerics.Support;

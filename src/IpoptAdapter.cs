@@ -153,7 +153,7 @@ namespace Cureos.Numerics
         /// constraints, information about the derivatives, and the callback
         /// function for the computation of the optimization problem
         /// functions and derivatives.  During this call, the options file
-        /// PARAMS.DAT is read as well.
+        /// ipopt.opt is read as well.
         /// </summary>
         /// <param name="n">Number of optimization variables</param>
         /// <param name="x_L">Lower bounds on variables. This array of size n is copied internally, so that the
@@ -260,8 +260,15 @@ namespace Cureos.Numerics
         /// <param name="ipopt_problem">Pointer to Ipopt problem</param>
         /// <param name="intermediate_cb">Intermediate callback function</param>
         /// <returns>true if the callback function could be set successfully, false otherwise</returns>
+#if !PRE39
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern IpoptBoolType SetIntermediateCallback(IntPtr ipopt_problem, Intermediate_CB intermediate_cb);
+#else
+        public static IpoptBoolType SetIntermediateCallback(IntPtr ipopt_problem, Intermediate_CB intermediate_cb)
+        {
+            return IpoptBoolType.False;
+        }
+#endif
 
         /// <summary>
         /// Function calling the IPOPT optimization algorithm for a problem previously defined with the constructor.

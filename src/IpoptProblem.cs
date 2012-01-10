@@ -260,7 +260,7 @@ namespace Cureos.Numerics
         /// constraints, information about the derivatives, and the callback
         /// function for the computation of the optimization problem
         /// functions and derivatives.  During this call, the options file
-        /// PARAMS.DAT is read as well.
+        /// ipopt.opt is read as well.
         /// </summary>
         /// <param name="n">Number of optimization variables</param>
         /// <param name="x_L">Lower bounds on variables. This array of size n is copied internally, so that the
@@ -309,7 +309,7 @@ namespace Cureos.Numerics
         /// constraints, information about the derivatives, and the callback
         /// function for the computation of the optimization problem
         /// functions and derivatives.  During this call, the options file
-        /// PARAMS.DAT is read as well.
+        /// ipopt.opt is read as well.
         /// </summary>
         /// <param name="n">Number of optimization variables</param>
         /// <param name="x_L">Lower bounds on variables. This array of size n is copied internally, so that the
@@ -360,7 +360,7 @@ namespace Cureos.Numerics
         /// constraints, information about the derivatives, and the callback
         /// function for the computation of the optimization problem
         /// functions and derivatives. During this call, the options file
-        /// PARAMS.DAT is read as well.
+        /// ipopt.opt is read as well.
         /// </summary>
         /// <param name="n">Number of optimization variables</param>
         /// <param name="x_L">Lower bounds on variables. This array of size n is copied internally, so that the
@@ -558,13 +558,19 @@ namespace Cureos.Numerics
         /// IPOPT will use the options previously specified with AddOption for this problem.
         /// </summary>
         /// <param name="x">Input: Starting point; Output: Optimal solution</param>
-        /// <param name="obj_val">Final value of objective function (output only - ignored if null on input)</param>
+        /// <param name="obj_val">Final value of objective function (output only)</param>
         /// <param name="g">Values of constraint at final point (output only - ignored if null on input)</param>
         /// <param name="mult_g">Final multipliers for constraints (output only - ignored if null on input)</param>
         /// <param name="mult_x_L">Final multipliers for lower variable bounds (output only - ignored if null on input)</param>
         /// <param name="mult_x_U">Final multipliers for upper variable bounds (output only - ignored if null on input)</param>
         /// <returns>Outcome of the optimization procedure (e.g., success, failure etc).</returns>
-        public IpoptReturnCode SolveProblem(double[] x, out double obj_val, double[] g, double[] mult_g, double[] mult_x_L, double[] mult_x_U)
+#if !NET20
+        public IpoptReturnCode SolveProblem(double[] x, out double obj_val, double[] g = null, double[] mult_g = null, 
+            double[] mult_x_L = null, double[] mult_x_U = null)
+#else
+        public IpoptReturnCode SolveProblem(double[] x, out double obj_val, double[] g, double[] mult_g, 
+            double[] mult_x_L, double[] mult_x_U)
+#endif
         {
             if (!IsInitialized)
             {
