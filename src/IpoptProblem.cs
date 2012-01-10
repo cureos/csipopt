@@ -511,6 +511,7 @@ namespace Cureos.Numerics
         public bool SetScaling(double obj_scaling, double[] x_scaling, double[] g_scaling)
         {
             return IsInitialized &&
+                   AddOption("nlp_scaling_method", "user-scaling") &&
                    IpoptAdapter.SetIpoptProblemScaling(m_problem, obj_scaling, x_scaling, g_scaling) ==
                    IpoptBoolType.True;
         }
