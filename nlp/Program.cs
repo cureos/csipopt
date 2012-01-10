@@ -25,6 +25,7 @@ namespace hs071_cs
             {
                 /* Set some options.  The following ones are only examples,
                    they might not be suitable for your problem. */
+                problem.AddOption("derivative_test", "second-order");
                 problem.AddOption("tol", 1e-7);
                 problem.AddOption("mu_strategy", "adaptive");
                 problem.AddOption("output_file", "hs071.txt");

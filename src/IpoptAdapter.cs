@@ -76,7 +76,7 @@ namespace Cureos.Numerics
     IpoptBoolType new_x, int m, int nele_jac,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] iRow,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] jCol,
-    [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] values, IntPtr user_data);
+    [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] values, IntPtr user_data);
 
     /// <summary>
     /// Delegate defining the callback function for evaluating the Hessian of
@@ -102,7 +102,7 @@ namespace Cureos.Numerics
     IpoptBoolType new_lambda, int nele_hess,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] iRow,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] jCol,
-    [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] double[] values, IntPtr user_data);
+    [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] double[] values, IntPtr user_data);
 
     /// <summary>
     /// Delegate defining the callback function for giving intermediate
