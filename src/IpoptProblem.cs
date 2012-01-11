@@ -173,6 +173,29 @@ namespace Cureos.Numerics
                 m_eval_jac_g = eval_jac_g;
             }
 
+#if MONO
+            [AllowReversePInvokeCalls]
+            internal IpoptBoolType Evaluate(int n, IntPtr p_x, IpoptBoolType new_x, int m, int nele_jac,
+                IntPtr p_iRow, IntPtr p_jCol, IntPtr p_values, IntPtr user_data)
+            {
+                var x = new double[n];
+                var iRow = new int[nele_jac];
+                var jCol = new int[nele_jac];
+
+                if (p_x != IntPtr.Zero) Marshal.Copy(p_x, x, 0, n);
+                if (p_iRow != IntPtr.Zero) Marshal.Copy(p_iRow, iRow, 0, nele_jac);
+                if (p_jCol != IntPtr.Zero) Marshal.Copy(p_jCol, jCol, 0, nele_jac);
+                var values = p_values != IntPtr.Zero ? new double[nele_jac] : null;
+
+                var ret = m_eval_jac_g(n, x, new_x == IpoptBoolType.True, m, nele_jac, iRow, jCol, values);
+
+                if (p_values != IntPtr.Zero) Marshal.Copy(values, 0, p_values, nele_jac);
+                if (p_iRow != IntPtr.Zero) Marshal.Copy(iRow, 0, p_iRow, nele_jac);
+                if (p_jCol != IntPtr.Zero) Marshal.Copy(jCol, 0, p_jCol, nele_jac);
+
+                return ret ? IpoptBoolType.True : IpoptBoolType.False;
+            }
+#else
             [AllowReversePInvokeCalls]
             internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac, 
                 int[] iRow, int[] jCol, double[] values, IntPtr user_data)
@@ -181,6 +204,7 @@ namespace Cureos.Numerics
                            ? IpoptBoolType.True
                            : IpoptBoolType.False;
             }
+#endif
         }
 
         private class HessianEvaluator
@@ -192,8 +216,34 @@ namespace Cureos.Numerics
                 m_eval_h = eval_h;
             }
 
+#if MONO
             [AllowReversePInvokeCalls]
-            internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda, 
+            internal IpoptBoolType Evaluate(int n, IntPtr p_x, IpoptBoolType new_x, double obj_factor, int m, IntPtr p_lambda,
+                IpoptBoolType new_lambda, int nele_hess, IntPtr p_iRow, IntPtr p_jCol, IntPtr p_values, IntPtr user_data)
+            {
+                var x = new double[n];
+                var lambda = new double[m];
+                var iRow = new int[nele_hess];
+                var jCol = new int[nele_hess];
+
+                if (p_x != IntPtr.Zero) Marshal.Copy(p_x, x, 0, n);
+                if (p_lambda != IntPtr.Zero) Marshal.Copy(p_lambda, lambda, 0, m);
+                if (p_iRow != IntPtr.Zero) Marshal.Copy(p_iRow, iRow, 0, nele_hess);
+                if (p_jCol != IntPtr.Zero) Marshal.Copy(p_jCol, jCol, 0, nele_hess);
+                var values = p_values != IntPtr.Zero ? new double[nele_hess] : null;
+
+                var ret = m_eval_h(n, x, new_x == IpoptBoolType.True, obj_factor, m, lambda,
+                                new_lambda == IpoptBoolType.True, nele_hess, iRow, jCol, values);
+
+                if (p_values != IntPtr.Zero) Marshal.Copy(values, 0, p_values, nele_hess);
+                if (p_iRow != IntPtr.Zero) Marshal.Copy(iRow, 0, p_iRow, nele_hess);
+                if (p_jCol != IntPtr.Zero) Marshal.Copy(jCol, 0, p_jCol, nele_hess);
+
+                return ret ? IpoptBoolType.True : IpoptBoolType.False;
+            }
+#else
+            [AllowReversePInvokeCalls]
+            internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda,
                 IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
             {
                 return m_eval_h(n, x, new_x == IpoptBoolType.True, obj_factor, m, lambda,
@@ -201,6 +251,7 @@ namespace Cureos.Numerics
                            ? IpoptBoolType.True
                            : IpoptBoolType.False;
             }
+#endif
         }
 
         private class IntermediateReporter
@@ -653,12 +704,21 @@ namespace Cureos.Numerics
         /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
         /// of this base class to initialize the subclassed object.
         /// </summary>
+#if MONO
+        [AllowReversePInvokeCalls]
+        public virtual IpoptBoolType eval_jac_g(int n, IntPtr p_x, IpoptBoolType new_x, int m, int nele_jac,
+            IntPtr p_iRow, IntPtr p_jCol, IntPtr p_values, IntPtr user_data)
+        {
+            throw new NotSupportedException("Jacobian evaluation should be implemented in subclass.");
+        }
+#else
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType eval_jac_g(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac,
             int[] iRow, int[] jCol, double[] values, IntPtr user_data)
         {
             throw new NotSupportedException("Jacobian evaluation should be implemented in subclass.");
         }
+#endif
 
         /// <summary>
         /// Dummy implementation of the native Hessian evaluation delegate.
@@ -666,12 +726,21 @@ namespace Cureos.Numerics
         /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
         /// of this base class to initialize the subclassed object.
         /// </summary>
+#if MONO
+        [AllowReversePInvokeCalls]
+        public virtual IpoptBoolType eval_h(int n, IntPtr p_x, IpoptBoolType new_x, double obj_factor, int m, IntPtr p_lambda,
+            IpoptBoolType new_lambda, int nele_hess, IntPtr p_iRow, IntPtr p_jCol, IntPtr p_values, IntPtr user_data)
+        {
+            throw new NotSupportedException("Hessian evaluation should be implemented in subclass.");
+        }
+#else
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType eval_h(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda,
             IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
         {
             throw new NotSupportedException("Hessian evaluation should be implemented in subclass.");
         }
+#endif
 
         /// <summary>
         /// Dummy implementation of the native intermediate callback delegate.

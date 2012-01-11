@@ -71,12 +71,21 @@ namespace Cureos.Numerics
     /// <param name="values">Values of the non-zero Jacobian elements</param>
     /// <param name="user_data">Optional pointer to user defined data</param>
     /// <returns>true if evaluation succeeded, false otherwise</returns>
+#if MONO
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate IpoptBoolType Eval_Jac_G_CB(int n, IntPtr p_x,
+    IpoptBoolType new_x, int m, int nele_jac,
+    IntPtr p_iRow,
+    IntPtr p_jCol,
+    IntPtr p_values, IntPtr user_data);
+#else
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate IpoptBoolType Eval_Jac_G_CB(int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
     IpoptBoolType new_x, int m, int nele_jac,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] iRow,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] jCol,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] values, IntPtr user_data);
+#endif
 
     /// <summary>
     /// Delegate defining the callback function for evaluating the Hessian of
@@ -96,6 +105,15 @@ namespace Cureos.Numerics
     /// <param name="values">Values of the non-zero Hessian elements</param>
     /// <param name="user_data">Optional pointer to user defined data</param>
     /// <returns>true if evaluation succeeded, false otherwise</returns>
+#if MONO
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate IpoptBoolType Eval_H_CB(int n, IntPtr p_x,
+    IpoptBoolType new_x, double obj_factor, int m, IntPtr p_lambda,
+    IpoptBoolType new_lambda, int nele_hess,
+    IntPtr p_iRow,
+    IntPtr p_jCol,
+    IntPtr p_values, IntPtr user_data);
+#else
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate IpoptBoolType Eval_H_CB(int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
     IpoptBoolType new_x, double obj_factor, int m, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] lambda,
@@ -103,6 +121,7 @@ namespace Cureos.Numerics
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] iRow,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] jCol,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] double[] values, IntPtr user_data);
+#endif
 
     /// <summary>
     /// Delegate defining the callback function for giving intermediate
