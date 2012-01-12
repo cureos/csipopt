@@ -19,11 +19,11 @@ namespace Cureos.Numerics
     /// <param name="x">Problem variables</param>
     /// <param name="new_x">true if problem variables are new for this call, false otherwise</param>
     /// <param name="obj_value">Evaluated objective function value</param>
-    /// <param name="user_data">Optional pointer to user defined data</param>
+    /// <param name="p_user_data">Optional pointer to user defined data</param>
     /// <returns>true if evaluation succeeded, false otherwise</returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate IpoptBoolType Eval_F_CB(int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-    IpoptBoolType new_x, out double obj_value, IntPtr user_data);
+    IpoptBoolType new_x, out double obj_value, IntPtr p_user_data);
 
     /// <summary>
     /// Delegate defining the callback function for evaluating the gradient of
@@ -34,11 +34,11 @@ namespace Cureos.Numerics
     /// <param name="x">Problem variables</param>
     /// <param name="new_x">true if problem variables are new for this call, false otherwise</param>
     /// <param name="grad_f">Objective function gradient</param>
-    /// <param name="user_data">Optional pointer to user defined data</param>
+    /// <param name="p_user_data">Optional pointer to user defined data</param>
     /// <returns>true if evaluation succeeded, false otherwise</returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate IpoptBoolType Eval_Grad_F_CB(int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-    IpoptBoolType new_x, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] grad_f, IntPtr user_data);
+    IpoptBoolType new_x, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] grad_f, IntPtr p_user_data);
 
     /// <summary>
     /// Delegate defining the callback function for evaluating the value of
@@ -50,11 +50,11 @@ namespace Cureos.Numerics
     /// <param name="new_x">true if problem variables are new for this call, false otherwise</param>
     /// <param name="m">Number of constraint functions</param>
     /// <param name="g">Calculated values of the constraint functions</param>
-    /// <param name="user_data">Optional pointer to user defined data</param>
+    /// <param name="p_user_data">Optional pointer to user defined data</param>
     /// <returns>true if evaluation succeeded, false otherwise</returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate IpoptBoolType Eval_G_CB(int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
-    IpoptBoolType new_x, int m, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] double[] g, IntPtr user_data);
+    IpoptBoolType new_x, int m, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] double[] g, IntPtr p_user_data);
 
     /// <summary>
     /// Delegate defining the callback function for evaluating the Jacobian of
@@ -69,7 +69,7 @@ namespace Cureos.Numerics
     /// <param name="iRow">Row indices of the non-zero Jacobian elements, defined here if values is null</param>
     /// <param name="jCol">Column indices of the non-zero Jacobian elements, defined here if values is null</param>
     /// <param name="values">Values of the non-zero Jacobian elements</param>
-    /// <param name="user_data">Optional pointer to user defined data</param>
+    /// <param name="p_user_data">Optional pointer to user defined data</param>
     /// <returns>true if evaluation succeeded, false otherwise</returns>
 #if MONO
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -77,14 +77,14 @@ namespace Cureos.Numerics
     IpoptBoolType new_x, int m, int nele_jac,
     IntPtr p_iRow,
     IntPtr p_jCol,
-    IntPtr p_values, IntPtr user_data);
+    IntPtr p_values, IntPtr p_user_data);
 #else
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate IpoptBoolType Eval_Jac_G_CB(int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
     IpoptBoolType new_x, int m, int nele_jac,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] iRow,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] int[] jCol,
-    [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] values, IntPtr user_data);
+    [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] double[] values, IntPtr p_user_data);
 #endif
 
     /// <summary>
@@ -103,7 +103,7 @@ namespace Cureos.Numerics
     /// <param name="iRow">Row indices of the non-zero Hessian elements, defined here if values is null</param>
     /// <param name="jCol">Column indices of the non-zero Hessian elements, defined here if values is null</param>
     /// <param name="values">Values of the non-zero Hessian elements</param>
-    /// <param name="user_data">Optional pointer to user defined data</param>
+    /// <param name="p_user_data">Optional pointer to user defined data</param>
     /// <returns>true if evaluation succeeded, false otherwise</returns>
 #if MONO
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -112,7 +112,7 @@ namespace Cureos.Numerics
     IpoptBoolType new_lambda, int nele_hess,
     IntPtr p_iRow,
     IntPtr p_jCol,
-    IntPtr p_values, IntPtr user_data);
+    IntPtr p_values, IntPtr p_user_data);
 #else
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate IpoptBoolType Eval_H_CB(int n, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] double[] x,
@@ -120,7 +120,7 @@ namespace Cureos.Numerics
     IpoptBoolType new_lambda, int nele_hess,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] iRow,
     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] int[] jCol,
-    [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] double[] values, IntPtr user_data);
+    [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 7)] double[] values, IntPtr p_user_data);
 #endif
 
     /// <summary>
@@ -145,13 +145,13 @@ namespace Cureos.Numerics
     /// <param name="alpha_du">The stepsize for the dual variables</param>
     /// <param name="alpha_pr">The stepsize for the primal variables</param>
     /// <param name="ls_trials">The number of backtracking line search steps</param>
-    /// <param name="user_data">Optional pointer to user defined data</param>
+    /// <param name="p_user_data">Optional pointer to user defined data</param>
     /// <returns>true if the optimization should proceeded after callback return, false if
     /// the optimization should be terminated prematurely</returns>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate IpoptBoolType Intermediate_CB(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr,
     double inf_du, double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, 
-    IntPtr user_data);
+    IntPtr p_user_data);
 
     #endregion
 
@@ -300,11 +300,11 @@ namespace Cureos.Numerics
         /// <param name="mult_g">Final multipliers for constraints (output only - ignored if null on input)</param>
         /// <param name="mult_x_L">Final multipliers for lower variable bounds (output only - ignored if null on input)</param>
         /// <param name="mult_x_U">Final multipliers for upper variable bounds (output only - ignored if null on input)</param>
-        /// <param name="user_data">Optional pointer to user data</param>
+        /// <param name="p_user_data">Optional pointer to user data</param>
         /// <returns>Outcome of the optimization procedure (e.g., success, failure etc).</returns>
         [DllImport(IpoptDllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern IpoptReturnCode IpoptSolve(IntPtr ipopt_problem, double[] x, double[] g,
-            out double obj_val, double[] mult_g, double[] mult_x_L, double[] mult_x_U, IntPtr user_data);
+            out double obj_val, double[] mult_g, double[] mult_x_L, double[] mult_x_U, IntPtr p_user_data);
 
         #endregion
     }

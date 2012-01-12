@@ -118,65 +118,65 @@ namespace Cureos.Numerics
 
         private class ObjectiveEvaluator
         {
-            private readonly EvaluateObjectiveDelegate m_eval_f;
+            private readonly EvaluateObjectiveDelegate m_eval_f_cb;
 
-            internal ObjectiveEvaluator(EvaluateObjectiveDelegate eval_f)
+            internal ObjectiveEvaluator(EvaluateObjectiveDelegate eval_f_cb)
             {
-                m_eval_f = eval_f;
+                m_eval_f_cb = eval_f_cb;
             }
 
             [AllowReversePInvokeCalls]
-            internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr user_data)
+            internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr p_user_data)
             {
-                return m_eval_f(n, x, new_x == IpoptBoolType.True, out obj_value) ? IpoptBoolType.True : IpoptBoolType.False;
+                return m_eval_f_cb(n, x, new_x == IpoptBoolType.True, out obj_value) ? IpoptBoolType.True : IpoptBoolType.False;
             }
         }
 
         private class ConstraintsEvaluator
         {
-            private readonly EvaluateConstraintsDelegate m_eval_g;
+            private readonly EvaluateConstraintsDelegate m_eval_g_cb;
 
-            internal ConstraintsEvaluator(EvaluateConstraintsDelegate eval_g)
+            internal ConstraintsEvaluator(EvaluateConstraintsDelegate eval_g_cb)
             {
-                m_eval_g = eval_g;
+                m_eval_g_cb = eval_g_cb;
             }
 
             [AllowReversePInvokeCalls]
-            internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr user_data)
+            internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr p_user_data)
             {
-                return m_eval_g(n, x, new_x == IpoptBoolType.True, m, g) ? IpoptBoolType.True : IpoptBoolType.False;
+                return m_eval_g_cb(n, x, new_x == IpoptBoolType.True, m, g) ? IpoptBoolType.True : IpoptBoolType.False;
             }
         }
 
         private class ObjectiveGradientEvaluator
         {
-            private readonly EvaluateObjectiveGradientDelegate m_eval_grad_f;
+            private readonly EvaluateObjectiveGradientDelegate m_eval_grad_f_cb;
 
-            internal ObjectiveGradientEvaluator(EvaluateObjectiveGradientDelegate eval_grad_f)
+            internal ObjectiveGradientEvaluator(EvaluateObjectiveGradientDelegate eval_grad_f_cb)
             {
-                m_eval_grad_f = eval_grad_f;
+                m_eval_grad_f_cb = eval_grad_f_cb;
             }
 
             [AllowReversePInvokeCalls]
-            internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr user_data)
+            internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr p_user_data)
             {
-                return m_eval_grad_f(n, x, new_x == IpoptBoolType.True, grad_f) ? IpoptBoolType.True : IpoptBoolType.False;
+                return m_eval_grad_f_cb(n, x, new_x == IpoptBoolType.True, grad_f) ? IpoptBoolType.True : IpoptBoolType.False;
             }
         }
 
         private class JacobianEvaluator
         {
-            private readonly EvaluateJacobianDelegate m_eval_jac_g;
+            private readonly EvaluateJacobianDelegate m_eval_jac_g_cb;
 
-            internal JacobianEvaluator(EvaluateJacobianDelegate eval_jac_g)
+            internal JacobianEvaluator(EvaluateJacobianDelegate eval_jac_g_cb)
             {
-                m_eval_jac_g = eval_jac_g;
+                m_eval_jac_g_cb = eval_jac_g_cb;
             }
 
 #if MONO
             [AllowReversePInvokeCalls]
             internal IpoptBoolType Evaluate(int n, IntPtr p_x, IpoptBoolType new_x, int m, int nele_jac,
-                IntPtr p_iRow, IntPtr p_jCol, IntPtr p_values, IntPtr user_data)
+                IntPtr p_iRow, IntPtr p_jCol, IntPtr p_values, IntPtr p_user_data)
             {
                 var x = new double[n];
                 var iRow = new int[nele_jac];
@@ -187,7 +187,7 @@ namespace Cureos.Numerics
                 if (p_jCol != IntPtr.Zero) Marshal.Copy(p_jCol, jCol, 0, nele_jac);
                 var values = p_values != IntPtr.Zero ? new double[nele_jac] : null;
 
-                var ret = m_eval_jac_g(n, x, new_x == IpoptBoolType.True, m, nele_jac, iRow, jCol, values);
+                var ret = m_eval_jac_g_cb(n, x, new_x == IpoptBoolType.True, m, nele_jac, iRow, jCol, values);
 
                 if (p_values != IntPtr.Zero) Marshal.Copy(values, 0, p_values, nele_jac);
                 if (p_iRow != IntPtr.Zero) Marshal.Copy(iRow, 0, p_iRow, nele_jac);
@@ -198,9 +198,9 @@ namespace Cureos.Numerics
 #else
             [AllowReversePInvokeCalls]
             internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac, 
-                int[] iRow, int[] jCol, double[] values, IntPtr user_data)
+                int[] iRow, int[] jCol, double[] values, IntPtr p_user_data)
             {
-                return m_eval_jac_g(n, x, new_x == IpoptBoolType.True, m, nele_jac, iRow, jCol, values)
+                return m_eval_jac_g_cb(n, x, new_x == IpoptBoolType.True, m, nele_jac, iRow, jCol, values)
                            ? IpoptBoolType.True
                            : IpoptBoolType.False;
             }
@@ -209,17 +209,17 @@ namespace Cureos.Numerics
 
         private class HessianEvaluator
         {
-            private readonly EvaluateHessianDelegate m_eval_h;
+            private readonly EvaluateHessianDelegate m_eval_h_cb;
 
-            internal HessianEvaluator(EvaluateHessianDelegate eval_h)
+            internal HessianEvaluator(EvaluateHessianDelegate eval_h_cb)
             {
-                m_eval_h = eval_h;
+                m_eval_h_cb = eval_h_cb;
             }
 
 #if MONO
             [AllowReversePInvokeCalls]
             internal IpoptBoolType Evaluate(int n, IntPtr p_x, IpoptBoolType new_x, double obj_factor, int m, IntPtr p_lambda,
-                IpoptBoolType new_lambda, int nele_hess, IntPtr p_iRow, IntPtr p_jCol, IntPtr p_values, IntPtr user_data)
+                IpoptBoolType new_lambda, int nele_hess, IntPtr p_iRow, IntPtr p_jCol, IntPtr p_values, IntPtr p_user_data)
             {
                 var x = new double[n];
                 var lambda = new double[m];
@@ -232,7 +232,7 @@ namespace Cureos.Numerics
                 if (p_jCol != IntPtr.Zero) Marshal.Copy(p_jCol, jCol, 0, nele_hess);
                 var values = p_values != IntPtr.Zero ? new double[nele_hess] : null;
 
-                var ret = m_eval_h(n, x, new_x == IpoptBoolType.True, obj_factor, m, lambda,
+                var ret = m_eval_h_cb(n, x, new_x == IpoptBoolType.True, obj_factor, m, lambda,
                                 new_lambda == IpoptBoolType.True, nele_hess, iRow, jCol, values);
 
                 if (p_values != IntPtr.Zero) Marshal.Copy(values, 0, p_values, nele_hess);
@@ -244,9 +244,9 @@ namespace Cureos.Numerics
 #else
             [AllowReversePInvokeCalls]
             internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda,
-                IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
+                IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr p_user_data)
             {
-                return m_eval_h(n, x, new_x == IpoptBoolType.True, obj_factor, m, lambda,
+                return m_eval_h_cb(n, x, new_x == IpoptBoolType.True, obj_factor, m, lambda,
                                 new_lambda == IpoptBoolType.True, nele_hess, iRow, jCol, values)
                            ? IpoptBoolType.True
                            : IpoptBoolType.False;
@@ -256,18 +256,18 @@ namespace Cureos.Numerics
 
         private class IntermediateReporter
         {
-            private readonly IntermediateDelegate m_intermediate;
+            private readonly IntermediateDelegate m_intermediate_cb;
 
-            internal IntermediateReporter(IntermediateDelegate intermediate)
+            internal IntermediateReporter(IntermediateDelegate intermediate_cb)
             {
-                m_intermediate = intermediate;
+                m_intermediate_cb = intermediate_cb;
             }
 
             [AllowReversePInvokeCalls]
             internal IpoptBoolType Report(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
-                double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
+                double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr p_user_data)
             {
-                return m_intermediate(alg_mod, iter_count, obj_value, inf_pr, inf_du, mu, d_norm, 
+                return m_intermediate_cb(alg_mod, iter_count, obj_value, inf_pr, inf_du, mu, d_norm, 
                     regularization_size, alpha_du, alpha_pr, ls_trials) ? IpoptBoolType.True : IpoptBoolType.False;
             }
         }
@@ -669,7 +669,7 @@ namespace Cureos.Numerics
         /// of this base class to initialize the subclassed object.
         /// </summary>
         [AllowReversePInvokeCalls]
-        public virtual IpoptBoolType eval_f(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr user_data)
+        public virtual IpoptBoolType eval_f(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr p_user_data)
         {
             throw new NotSupportedException("Objective function evaluation should be implemented in subclass.");
         }
@@ -681,7 +681,7 @@ namespace Cureos.Numerics
         /// of this base class to initialize the subclassed object.
         /// </summary>
         [AllowReversePInvokeCalls]
-        public virtual IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr user_data)
+        public virtual IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr p_user_data)
         {
             throw new NotSupportedException("Constraints evaluation should be implemented in subclass.");
         }
@@ -693,7 +693,7 @@ namespace Cureos.Numerics
         /// of this base class to initialize the subclassed object.
         /// </summary>
         [AllowReversePInvokeCalls]
-        public virtual IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr user_data)
+        public virtual IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr p_user_data)
         {
             throw new NotSupportedException("Objective function gradient evaluation should be implemented in subclass.");
         }
@@ -707,14 +707,14 @@ namespace Cureos.Numerics
 #if MONO
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType eval_jac_g(int n, IntPtr p_x, IpoptBoolType new_x, int m, int nele_jac,
-            IntPtr p_iRow, IntPtr p_jCol, IntPtr p_values, IntPtr user_data)
+            IntPtr p_iRow, IntPtr p_jCol, IntPtr p_values, IntPtr p_user_data)
         {
             throw new NotSupportedException("Jacobian evaluation should be implemented in subclass.");
         }
 #else
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType eval_jac_g(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac,
-            int[] iRow, int[] jCol, double[] values, IntPtr user_data)
+            int[] iRow, int[] jCol, double[] values, IntPtr p_user_data)
         {
             throw new NotSupportedException("Jacobian evaluation should be implemented in subclass.");
         }
@@ -729,14 +729,14 @@ namespace Cureos.Numerics
 #if MONO
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType eval_h(int n, IntPtr p_x, IpoptBoolType new_x, double obj_factor, int m, IntPtr p_lambda,
-            IpoptBoolType new_lambda, int nele_hess, IntPtr p_iRow, IntPtr p_jCol, IntPtr p_values, IntPtr user_data)
+            IpoptBoolType new_lambda, int nele_hess, IntPtr p_iRow, IntPtr p_jCol, IntPtr p_values, IntPtr p_user_data)
         {
             throw new NotSupportedException("Hessian evaluation should be implemented in subclass.");
         }
 #else
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType eval_h(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda,
-            IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
+            IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr p_user_data)
         {
             throw new NotSupportedException("Hessian evaluation should be implemented in subclass.");
         }
@@ -750,7 +750,7 @@ namespace Cureos.Numerics
         /// </summary>
         [AllowReversePInvokeCalls]
         public virtual IpoptBoolType intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
-            double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
+            double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr p_user_data)
         {
             throw new NotSupportedException("Intermediate callback method should be implemented in subclass.");
         }

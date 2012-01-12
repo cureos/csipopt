@@ -35,7 +35,7 @@ namespace Cureos.Numerics.Nlp
         }
 
         [AllowReversePInvokeCalls]
-        public override IpoptBoolType eval_f(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr user_data)
+        public override IpoptBoolType eval_f(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr p_user_data)
         {
             obj_value = x[0] * x[3] * (x[0] + x[1] + x[2]) + x[2];
 
@@ -43,7 +43,7 @@ namespace Cureos.Numerics.Nlp
         }
 
         [AllowReversePInvokeCalls]
-        public override IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr user_data)
+        public override IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr p_user_data)
         {
             g[0] = x[0] * x[1] * x[2] * x[3];
             g[1] = x[0] * x[0] + x[1] * x[1] + x[2] * x[2] + x[3] * x[3];
@@ -52,7 +52,7 @@ namespace Cureos.Numerics.Nlp
         }
 
         [AllowReversePInvokeCalls]
-        public override IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr user_data)
+        public override IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr p_user_data)
         {
             grad_f[0] = x[0] * x[3] + x[3] * (x[0] + x[1] + x[2]);
             grad_f[1] = x[0] * x[3];
@@ -64,7 +64,7 @@ namespace Cureos.Numerics.Nlp
 
         [AllowReversePInvokeCalls]
         public override IpoptBoolType eval_jac_g(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac, 
-            int[] iRow, int[] jCol, double[] values, IntPtr user_data)
+            int[] iRow, int[] jCol, double[] values, IntPtr p_user_data)
         {
             if (values == null)
             {
@@ -108,7 +108,7 @@ namespace Cureos.Numerics.Nlp
 
         [AllowReversePInvokeCalls]
         public override IpoptBoolType eval_h(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda, 
-            IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr user_data)
+            IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr p_user_data)
         {
             if (values == null)
             {
@@ -176,7 +176,7 @@ namespace Cureos.Numerics.Nlp
         [AllowReversePInvokeCalls]
         public override IpoptBoolType intermediate(
             IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
-            double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr user_data)
+            double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr p_user_data)
         {
             Console.WriteLine("Intermediate callback method at iteration {0} in {1} with d_norm {2}",
                 iter_count, alg_mod, d_norm);
