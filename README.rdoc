@@ -1,6 +1,6 @@
 = csipopt
 
-Copyright (c) 2010-2011 Anders Gustafsson, Cureos AB.
+Copyright (c) 2010-2012 Anders Gustafsson, Cureos AB.
 Published under the Eclipse Public License.
 
 
@@ -65,7 +65,7 @@ To run the respective applications, type
 
 === Mono examples
  
-The interface is equally applicable to Mono, and can be compiled using the gmcs compiler.
+The interface is also applicable to Mono, and can be compiled using the gmcs compiler.
 When running from the Mono command prompt, create a class library by running the batch script
 
   build_library_with_mono
@@ -76,14 +76,15 @@ Create an example application from the C# file Program.cs by running the batch s
 
 To run the example application, type
 
-  mono hs071_cs_mono
+  mono hs071_cs_mono.exe
 
-NOTE! Following recent changes in the signatures of the native callback functions, the Mono
-runtime fails when calling the native callback function implementations. However, the gmcs
-compiler appears to compile the csipopt code correctly, and gmcs compiled code can be 
-successfully executed by the regular .NET runtime.
+NOTE! The Mono runtime is more conservative when handling array marshaling in unmanaged
+function pointers, i.e. the callback functions. This is handled through a modification of
+the signatures of the Eval_Jac_G_CB and Eval_H_CB delegates and explicit copying of arrays
+in the managed function wrappers in IpoptProblem. To access these modifications, build the
+library with the MONO symbol defined.
 
 
 == Revision
 
-Last updated on December 18, 2011 by Anders Gustafsson, anders[at]cureos[dot]com, http://www.cureos.com.
+Last updated on January 13, 2012 by Anders Gustafsson, anders[at]cureos[dot]com, http://www.cureos.com.
