@@ -10,7 +10,9 @@ namespace Cureos.Numerics
     /// </summary>
     public enum IpoptBoolType
     {
+#pragma warning disable 1591
         False = 0,
         True = 1
+#pragma warning restore 1591
     }
 }

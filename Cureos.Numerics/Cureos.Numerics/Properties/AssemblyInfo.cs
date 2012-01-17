@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Cureos.Numerics")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Class library for accessing the Ipopt NLP optimizer from .NET code")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Cureos AB")]
-[assembly: AssemblyProduct("Cureos.Numerics")]
-[assembly: AssemblyCopyright("Copyright © Cureos AB 2011")]
+[assembly: AssemblyProduct("csipopt")]
+[assembly: AssemblyCopyright("Copyright © Cureos AB 2010-2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

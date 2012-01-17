@@ -155,6 +155,9 @@ namespace Cureos.Numerics
 
     #endregion
 
+    /// <summary>
+    /// Static class providing the P/Invoke signatures to the Ipopt C interface.
+    /// </summary>
     public static class IpoptAdapter
     {
         #region FIELDS
@@ -190,7 +193,7 @@ namespace Cureos.Numerics
         /// greater or equal than the number specified by option 'nlp_upper_bound_inf' is interpreted to be plus infinity.</param>
         /// <param name="nele_jac">Number of non-zero elements in constraint Jacobian.</param>
         /// <param name="nele_hess">Number of non-zero elements in Hessian of Lagrangian.</param>
-        /// <param name="index_style">Indexing style for iRow & jCol, 0 for C style, 1 for Fortran style</param>
+        /// <param name="index_style">Indexing style for iRow and jCol, 0 for C style, 1 for Fortran style</param>
         /// <param name="eval_f">Callback function for evaluating objective function</param>
         /// <param name="eval_g">Callback function for evaluating constraint functions</param>
         /// <param name="eval_grad_f">Callback function for evaluating gradient of objective function</param>

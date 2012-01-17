@@ -10,7 +10,9 @@ namespace Cureos.Numerics
     /// </summary>
     public enum IpoptIndexStyle
     {
+#pragma warning disable 1591
         C = 0,
         Fortran = 1
+#pragma warning restore 1591
     }
 }

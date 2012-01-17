@@ -112,6 +112,9 @@ namespace Cureos.Numerics
 
     #endregion
 
+    /// <summary>
+    /// Managed wrapper and base class for setup and solution of an Ipopt problem.
+    /// </summary>
     public class IpoptProblem : IDisposable
     {
         #region INTERNAL CALLBACK FUNCTION CLASSES
@@ -485,6 +488,9 @@ namespace Cureos.Numerics
 
         #region PROPERTIES
 
+        /// <summary>
+        /// Gets the initialization status of the Ipopt problem.
+        /// </summary>
         public bool IsInitialized
         {
             get { return m_problem != IntPtr.Zero; }

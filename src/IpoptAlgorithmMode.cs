@@ -10,7 +10,9 @@ namespace Cureos.Numerics
     /// </summary>
     public enum IpoptAlgorithmMode
     {
+#pragma warning disable 1591
         RegularMode = 0,
         RestorationPhaseMode = 1
+#pragma warning restore 1591
     }
 }

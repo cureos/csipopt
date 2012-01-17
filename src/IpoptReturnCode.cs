@@ -10,6 +10,7 @@ namespace Cureos.Numerics
     /// </summary>
     public enum IpoptReturnCode
     {
+#pragma warning disable 1591
         Solve_Succeeded = 0,
         Solved_To_Acceptable_Level = 1,
         Infeasible_Problem_Detected = 2,
@@ -33,5 +34,6 @@ namespace Cureos.Numerics
         Internal_Error = -199,
 
         Problem_Not_Initialized = -900
+#pragma warning restore 1591
     }
 }
