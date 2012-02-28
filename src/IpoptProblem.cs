@@ -403,9 +403,9 @@ namespace Cureos.Numerics
         }
 
         /// <summary>
-        /// Constructor for creating a subclassed Ipopt Problem object using 
+        /// Constructor for creating a subclassed Ipopt Problem object using managed or
         /// native function delegates. This is the preferred constructor when
-        /// subclassing IpoptProblem. Prerequisite is that the native optimization 
+        /// subclassing IpoptProblem. Prerequisite is that the managed/native optimization 
         /// function delegates are implemented in the inheriting class.
         /// This function
         /// initializes an object that can be passed to the IpoptSolve call.  It
@@ -435,9 +435,9 @@ namespace Cureos.Numerics
         /// <param name="useNativeCallbackFunctions">If set to true, native callback functions are used to setup
         /// the Ipopt problem; if set to false, managed callback functions are used.</param>
         /// <param name="useHessianApproximation">If set to true, the Ipopt optimizer creates a limited memory
-        /// Hessian approximation and <see cref="eval_h"/> need not be implemented. If set to false, an exact Hessian
-        /// should be evaluated using <see cref="eval_h"/>.</param>
-        /// <param name="useIntermediateCallback">If set to true, the method <see cref="intermediate"/>will be called 
+        /// Hessian approximation and the eval_h (managed or native) method need not be implemented. 
+        /// If set to false, an exact Hessian should be evaluated using the appropriate Hessian evaluation method.</param>
+        /// <param name="useIntermediateCallback">If set to true, the intermediate method (managed or native) will be called 
         /// after each full iteration. If false, the intermediate callback function will not be called.</param>
         protected IpoptProblem(int n, double[] x_L, double[] x_U, int m, double[] g_L, double[] g_U, int nele_jac, int nele_hess,
             bool useNativeCallbackFunctions = false, bool useHessianApproximation = false, bool useIntermediateCallback = false)

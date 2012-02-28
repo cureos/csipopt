@@ -1,1 +1,1 @@
-csc /target:library /out:Cureos.Numerics.dll ..\src\IpoptProblem.cs ..\src\IpoptAdapter.cs ..\src\IpoptAlgorithmMode.cs ..\src\IpoptReturnCode.cs ..\src\IpoptBoolType.cs ..\src\IpoptIndexStyle.cs
+csc /platform:anycpu /target:library /debug:pdbonly /optimize /doc:Cureos.Numerics.xml /out:Cureos.Numerics.dll ..\src\IpoptProblem.cs ..\src\IpoptAdapter.cs ..\src\IpoptAlgorithmMode.cs ..\src\IpoptReturnCode.cs ..\src\IpoptBoolType.cs ..\src\IpoptIndexStyle.cs

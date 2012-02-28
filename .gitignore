@@ -19,6 +19,8 @@ Ipopt*.dll
 /Cureos.Numerics.dll
 /build/*.txt
 /build/*.dll
+/build/*.pdb
+/build/*.xml
 /build/*.exe
 *.txt
 /Cureos.Numerics/Tests.Cureos.Numerics/bin/
