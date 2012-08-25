@@ -4,6 +4,8 @@ Cureos.Numerics/_ReSharper.Cureos.Numerics/
 *.user
 *.suo
 *.vs10x
+[Bb]in/
+[Oo]bj/
 Cureos.Numerics/Cureos.Numerics/bin/
 Cureos.Numerics/Cureos.Numerics/obj/
 Cureos.Numerics/hs071_cs/bin/

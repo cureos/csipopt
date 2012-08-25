@@ -34,7 +34,9 @@ namespace Cureos.Numerics.Nlp
         {
         }
 
+#if SILVERLIGHT
         [AllowReversePInvokeCalls]
+#endif
         public override IpoptBoolType eval_f(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr p_user_data)
         {
             obj_value = x[0] * x[3] * (x[0] + x[1] + x[2]) + x[2];
@@ -42,7 +44,9 @@ namespace Cureos.Numerics.Nlp
             return IpoptBoolType.True;
         }
 
+#if SILVERLIGHT
         [AllowReversePInvokeCalls]
+#endif
         public override IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr p_user_data)
         {
             g[0] = x[0] * x[1] * x[2] * x[3];
@@ -51,7 +55,9 @@ namespace Cureos.Numerics.Nlp
             return IpoptBoolType.True;
         }
 
+#if SILVERLIGHT
         [AllowReversePInvokeCalls]
+#endif
         public override IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr p_user_data)
         {
             grad_f[0] = x[0] * x[3] + x[3] * (x[0] + x[1] + x[2]);
@@ -62,7 +68,9 @@ namespace Cureos.Numerics.Nlp
             return IpoptBoolType.True;
         }
 
+#if SILVERLIGHT
         [AllowReversePInvokeCalls]
+#endif
         public override IpoptBoolType eval_jac_g(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac, 
             int[] iRow, int[] jCol, double[] values, IntPtr p_user_data)
         {
@@ -106,7 +114,9 @@ namespace Cureos.Numerics.Nlp
             return IpoptBoolType.True;
         }
 
+#if SILVERLIGHT
         [AllowReversePInvokeCalls]
+#endif
         public override IpoptBoolType eval_h(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda, 
             IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr p_user_data)
         {

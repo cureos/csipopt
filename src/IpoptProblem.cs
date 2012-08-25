@@ -128,7 +128,9 @@ namespace Cureos.Numerics
                 m_eval_f_cb = eval_f_cb;
             }
 
+#if SILVERLIGHT
             [AllowReversePInvokeCalls]
+#endif
             internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr p_user_data)
             {
                 return m_eval_f_cb(n, x, new_x == IpoptBoolType.True, out obj_value) ? IpoptBoolType.True : IpoptBoolType.False;
@@ -144,7 +146,9 @@ namespace Cureos.Numerics
                 m_eval_g_cb = eval_g_cb;
             }
 
+#if SILVERLIGHT
             [AllowReversePInvokeCalls]
+#endif
             internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr p_user_data)
             {
                 return m_eval_g_cb(n, x, new_x == IpoptBoolType.True, m, g) ? IpoptBoolType.True : IpoptBoolType.False;
@@ -160,7 +164,9 @@ namespace Cureos.Numerics
                 m_eval_grad_f_cb = eval_grad_f_cb;
             }
 
+#if SILVERLIGHT
             [AllowReversePInvokeCalls]
+#endif
             internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr p_user_data)
             {
                 return m_eval_grad_f_cb(n, x, new_x == IpoptBoolType.True, grad_f) ? IpoptBoolType.True : IpoptBoolType.False;
@@ -199,7 +205,9 @@ namespace Cureos.Numerics
                 return ret ? IpoptBoolType.True : IpoptBoolType.False;
             }
 #else
+#if SILVERLIGHT
             [AllowReversePInvokeCalls]
+#endif
             internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac, 
                 int[] iRow, int[] jCol, double[] values, IntPtr p_user_data)
             {
@@ -245,7 +253,9 @@ namespace Cureos.Numerics
                 return ret ? IpoptBoolType.True : IpoptBoolType.False;
             }
 #else
+#if SILVERLIGHT
             [AllowReversePInvokeCalls]
+#endif
             internal IpoptBoolType Evaluate(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda,
                 IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr p_user_data)
             {
@@ -266,7 +276,9 @@ namespace Cureos.Numerics
                 m_intermediate_cb = intermediate_cb;
             }
 
+#if SILVERLIGHT
             [AllowReversePInvokeCalls]
+#endif
             internal IpoptBoolType Report(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
                 double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr p_user_data)
             {
@@ -674,7 +686,9 @@ namespace Cureos.Numerics
         /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
         /// of this base class to initialize the subclassed object.
         /// </summary>
+#if SILVERLIGHT
         [AllowReversePInvokeCalls]
+#endif
         public virtual IpoptBoolType eval_f(int n, double[] x, IpoptBoolType new_x, out double obj_value, IntPtr p_user_data)
         {
             throw new NotSupportedException("Objective function evaluation should be implemented in subclass.");
@@ -686,7 +700,9 @@ namespace Cureos.Numerics
         /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
         /// of this base class to initialize the subclassed object.
         /// </summary>
+#if SILVERLIGHT
         [AllowReversePInvokeCalls]
+#endif
         public virtual IpoptBoolType eval_g(int n, double[] x, IpoptBoolType new_x, int m, double[] g, IntPtr p_user_data)
         {
             throw new NotSupportedException("Constraints evaluation should be implemented in subclass.");
@@ -698,7 +714,9 @@ namespace Cureos.Numerics
         /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
         /// of this base class to initialize the subclassed object.
         /// </summary>
+#if SILVERLIGHT
         [AllowReversePInvokeCalls]
+#endif
         public virtual IpoptBoolType eval_grad_f(int n, double[] x, IpoptBoolType new_x, double[] grad_f, IntPtr p_user_data)
         {
             throw new NotSupportedException("Objective function gradient evaluation should be implemented in subclass.");
@@ -718,7 +736,9 @@ namespace Cureos.Numerics
             throw new NotSupportedException("Jacobian evaluation should be implemented in subclass.");
         }
 #else
+#if SILVERLIGHT
         [AllowReversePInvokeCalls]
+#endif
         public virtual IpoptBoolType eval_jac_g(int n, double[] x, IpoptBoolType new_x, int m, int nele_jac,
             int[] iRow, int[] jCol, double[] values, IntPtr p_user_data)
         {
@@ -740,7 +760,9 @@ namespace Cureos.Numerics
             throw new NotSupportedException("Hessian evaluation should be implemented in subclass.");
         }
 #else
+#if SILVERLIGHT
         [AllowReversePInvokeCalls]
+#endif
         public virtual IpoptBoolType eval_h(int n, double[] x, IpoptBoolType new_x, double obj_factor, int m, double[] lambda,
             IpoptBoolType new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values, IntPtr p_user_data)
         {
@@ -754,7 +776,9 @@ namespace Cureos.Numerics
         /// the <see cref="IpoptProblem(int,double[],double[],int,double[],double[],int,int,bool,bool,bool)">protected constructor</see>
         /// of this base class to initialize the subclassed object.
         /// </summary>
+#if SILVERLIGHT
         [AllowReversePInvokeCalls]
+#endif
         public virtual IpoptBoolType intermediate(IpoptAlgorithmMode alg_mod, int iter_count, double obj_value, double inf_pr, double inf_du,
             double mu, double d_norm, double regularization_size, double alpha_du, double alpha_pr, int ls_trials, IntPtr p_user_data)
         {
