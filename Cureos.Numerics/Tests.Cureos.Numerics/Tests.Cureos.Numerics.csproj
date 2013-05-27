@@ -113,7 +113,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y /q /r /k "$(SolutionDir)..\..\Ipopt\Lib\$(PlatformName)\$(ConfigurationName)\Ipopt*.dll" "$(TargetDir)*.*"</PostBuildEvent>
+    <PostBuildEvent>xcopy /y /q /r /k "$(SolutionDir)..\..\Ipopt\Lib\$(PlatformName)\ReleaseMKL\*.dll" "$(TargetDir)*.*"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
